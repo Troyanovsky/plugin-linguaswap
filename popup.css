@@ -133,26 +133,67 @@ select:focus, input:focus {
 }
 
 .delete-btn {
-  background-color: #ff4b4b; /* Slightly adjusted to a softer red */
-  background-image: linear-gradient(145deg, #ff6666, #ff1a1a); /* Adds a subtle gradient */
-  color: white; /* White text for contrast */
-  padding: 8px 16px; /* More padding for a modern look */
-  font-size: 1em; /* Slightly larger font */
-  border: none; /* Remove any border */
-  border-radius: 6px; /* Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds a shadow for a raised effect */
-  cursor: pointer; /* Changes cursor to pointer */
-  transition: background-color 0.3s, transform 0.2s; /* Smooth transitions for interactivity */
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 8px 16px;
+  font-size: 1em;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .delete-btn:hover {
-  background-color: #ff3333; /* Darken on hover */
-  transform: translateY(-2px); /* Adds slight lift on hover */
+  background-color: #fecaca;
+  transform: translateY(-1px);
 }
 
 .delete-btn:active {
-  background-color: #e60000; /* Darkest red on click */
-  transform: translateY(0); /* Resets transform on click */
+  background-color: #e60000;
+  transform: translateY(0);
+}
+
+.edit-btn {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  padding: 8px 16px;
+  font-size: 1em;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #bae6fd;
+  transform: translateY(-1px);
+}
+
+.save-btn {
+  background-color: #dcfce7;
+  color: #16a34a;
+  padding: 8px 16px;
+  font-size: 1em;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.save-btn:hover {
+  background-color: #bbf7d0;
+  transform: translateY(-1px);
+}
+
+.word-edit-input {
+  padding: 4px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 150px;
 }
 
 .header {
@@ -205,4 +246,60 @@ input:checked + .toggle-slider {
 
 input:checked + .toggle-slider:before {
   transform: translateX(24px);
-} 
+}
+
+/* Add these button styles */
+.word-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}
+
+.edit-btn {
+  background-color: #e0f2fe;
+}
+
+.edit-btn:hover {
+  background-color: #bae6fd;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background-color: #fee2e2;
+}
+
+.delete-btn:hover {
+  background-color: #fecaca;
+  transform: translateY(-1px);
+}
+
+.save-btn {
+  background-color: #dcfce7;
+}
+
+.save-btn:hover {
+  background-color: #bbf7d0;
+  transform: translateY(-1px);
+}
+
+.word-edit-input {
+  padding: 4px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 150px;
+}

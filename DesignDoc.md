@@ -120,8 +120,10 @@ Key Features:
 - Responsive to page style changes
 
 ## Future Enhancements
+- Manage word translations (edit)
 - Support import of word lists (e.g. TOEFL, IELTS, etc.)
 - Easier management of word lists (sorting, pagination, searching, etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
+- Add contextual translation using LLMs
 - Enhanced error robustness
 - Unified hosted translation API for users without a translation API key

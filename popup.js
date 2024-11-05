@@ -111,19 +111,82 @@ function addWordToList(word, translation, container, langPairKey) {
   wordText.className = 'word-text';
   wordText.textContent = `${word} : ${translation}`;
   
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'word-actions';
+
+  // Edit button
+  const editBtn = document.createElement('button');
+  editBtn.className = 'icon-btn edit-btn';
+  editBtn.textContent = '✏️';  // pencil emoji
+  editBtn.title = "Edit translation";
+
+  // Delete button
   const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'delete-btn';
-  deleteBtn.textContent = 'Delete';
+  deleteBtn.className = 'icon-btn delete-btn';
+  deleteBtn.textContent = '🗑️';  // trash bin emoji
+  deleteBtn.title = "Delete word";
+
+  editBtn.addEventListener('click', () => {
+    // Replace text with input field
+    const inputField = document.createElement('input');
+    inputField.className = 'word-edit-input';
+    inputField.value = translation;
+    wordText.textContent = `${word} : `;
+    wordText.appendChild(inputField);
+
+    // Replace edit button with save button
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'icon-btn save-btn';
+    saveBtn.textContent = '💾';  // floppy disk emoji
+    saveBtn.title = "Save translation";
+
+    saveBtn.addEventListener('click', async () => {
+      const newTranslation = inputField.value.trim();
+      if (newTranslation) {
+        const { wordLists } = await chrome.storage.local.get('wordLists');
+        wordLists[langPairKey][word] = newTranslation;
+        await chrome.storage.local.set({ wordLists });
+
+        // Update display
+        wordText.textContent = `${word} : ${newTranslation}`;
+        actionsDiv.replaceChild(editBtn, saveBtn);
+
+        // Notify content script to update the page
+        try {
+          const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+          if (tabs[0]) {
+            await chrome.tabs.sendMessage(tabs[0].id, {
+              type: 'wordAdded',
+              word,
+              translation: newTranslation,
+              langPairKey
+            });
+          }
+        } catch (error) {
+          // Ignore the connection error as it's expected in some cases
+          console.debug('Content script communication error (expected):', error);
+        }
+
+        showNotification('Translation updated successfully! Reload the page to see the changes.');
+      }
+    });
+
+    actionsDiv.replaceChild(saveBtn, editBtn);
+    inputField.focus();
+  });
+
   deleteBtn.addEventListener('click', async () => {
     const { wordLists } = await chrome.storage.local.get('wordLists');
     delete wordLists[langPairKey][word];
     await chrome.storage.local.set({ wordLists });
     wordItem.remove();
-    showNotification('Word deleted successfully!');
+    showNotification('Word deleted successfully! Reload the page to see the changes.');
   });
 
+  actionsDiv.appendChild(editBtn);
+  actionsDiv.appendChild(deleteBtn);
   wordItem.appendChild(wordText);
-  wordItem.appendChild(deleteBtn);
+  wordItem.appendChild(actionsDiv);
   container.appendChild(wordItem);
 }
 
