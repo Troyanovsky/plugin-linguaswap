@@ -57,23 +57,52 @@ function replaceWords(word, translation) {
     // Create a regular expression that matches the word with word boundaries
     const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi');
     
-    // Process text nodes only
+    // Process all text nodes within the element
+    const textNodes = [];
     const walker = document.createTreeWalker(
       element,
       NodeFilter.SHOW_TEXT,
-      null,
+      {
+        acceptNode: function(node) {
+          // Skip if parent is already a linguaswap-word or if text doesn't contain the word
+          if (node.parentElement.classList.contains('linguaswap-word') || !regex.test(node.textContent)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      },
       false
     );
 
     let node;
     while (node = walker.nextNode()) {
-      const text = node.textContent;
-      if (regex.test(text)) {
-        const span = document.createElement('span');
-        span.innerHTML = text.replace(regex, `<span class="linguaswap-word" title="${word}">${translation}</span>`);
-        node.parentNode.replaceChild(span, node);
-      }
+      textNodes.push(node);
     }
+
+    // Replace text in all found nodes
+    textNodes.forEach(textNode => {
+      const fragment = document.createDocumentFragment();
+      const parts = textNode.textContent.split(regex);
+      const matches = textNode.textContent.match(regex) || [];
+      
+      parts.forEach((part, index) => {
+        // Add the regular text
+        if (part) {
+          fragment.appendChild(document.createTextNode(part));
+        }
+        
+        // Add the translated word if there's a match
+        if (index < matches.length) {
+          const span = document.createElement('span');
+          span.className = 'linguaswap-word';
+          span.setAttribute('title', matches[index]);
+          span.textContent = translation;
+          fragment.appendChild(span);
+        }
+      });
+
+      textNode.parentNode.replaceChild(fragment, textNode);
+    });
   });
 }
 
