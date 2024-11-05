@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LinguaSwap</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LinguaSwap</h1>
+            <label class="toggle">
+                <input type="checkbox" id="swapToggle">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn" data-tab="wordlist">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                    <rect x="9" y="3" width="6" height="4" rx="2" />
+                    <path d="M9 14h6" />
+                    <path d="M9 10h6" />
+                    <path d="M9 18h6" />
+                </svg>
+                Word List
+            </button>
+            <button class="tab-btn active" data-tab="settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+                </svg>
+                Settings
+            </button>
+        </div>
+
+        <!-- Add the tab content sections -->
+        <div class="tab-content active" id="settings">
+            <div class="form-group">
+                <label for="defaultLanguage">Default Language</label>
+                <select id="defaultLanguage">
+                    <option value="ZH">Chinese</option>
+                    <option value="EN">English</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="targetLanguage">Target Language</label>
+                <select id="targetLanguage">
+                    <option value="EN-US">English</option>
+                    <option value="DE">German</option>
+                    <option value="FR">French</option>
+                    <option value="ES">Spanish</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="deeplApiKey">DeepL API Key</label>
+                <input type="password" id="deeplApiKey">
+            </div>
+
+            <button id="saveSettings" class="primary-btn">Save Settings</button>
+        </div>
+
+        <div class="tab-content" id="wordlist">
+            <div id="wordList" class="word-list">
+                <!-- Words will be populated here -->
+            </div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>

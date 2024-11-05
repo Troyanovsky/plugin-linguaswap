@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "LinguaSwap",
+  "version": "1.0.0",
+  "description": "Learn new languages while browsing by replacing words with their translations",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api-free.deepl.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+} 
