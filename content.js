@@ -97,6 +97,11 @@ function replaceWords(word, translation) {
           span.className = 'linguaswap-word';
           span.setAttribute('title', matches[index]);
           span.textContent = translation;
+          const computedStyle = window.getComputedStyle(textNode.parentElement);
+          span.style.color = 'inherit';
+          span.style.fontSize = computedStyle.fontSize;
+          span.style.fontFamily = computedStyle.fontFamily;
+          span.style.fontWeight = computedStyle.fontWeight;
           fragment.appendChild(span);
         }
       });
@@ -144,9 +149,9 @@ function escapeRegExp(string) {
 const style = document.createElement('style');
 style.textContent = `
   .linguaswap-word {
-    color: #2196F3;
     cursor: help;
-    border-bottom: 1px dashed #2196F3;
+    border-bottom: 1px dashed currentColor;
+    text-decoration: none;
   }
 `;
 document.head.appendChild(style); 
