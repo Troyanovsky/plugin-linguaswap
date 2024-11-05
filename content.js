@@ -65,62 +65,69 @@ chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = 
 function replaceWords(word, translation) {
   const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p');
   
-  elements.forEach(element => {
-    if (shouldSkipElement(element)) return;
-
-    // Create a regular expression that matches the word with word boundaries
-    const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi');
+  // Get current settings to check language
+  chrome.storage.local.get('settings', ({ settings }) => {
+    const isChineseSource = settings?.defaultLanguage === 'ZH';
     
-    // Process all text nodes within the element
-    const textNodes = [];
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: function(node) {
-          // Skip if parent is already a linguaswap-word or if text doesn't contain the word
-          if (node.parentElement.classList.contains('linguaswap-word') || !regex.test(node.textContent)) {
-            return NodeFilter.FILTER_REJECT;
-          }
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      },
-      false
-    );
+    elements.forEach(element => {
+      if (shouldSkipElement(element)) return;
 
-    let node;
-    while (node = walker.nextNode()) {
-      textNodes.push(node);
-    }
-
-    // Replace text in all found nodes
-    textNodes.forEach(textNode => {
-      const fragment = document.createDocumentFragment();
-      const parts = textNode.textContent.split(regex);
-      const matches = textNode.textContent.match(regex) || [];
+      // Create appropriate regex based on language
+      const regex = isChineseSource
+        ? new RegExp(escapeRegExp(word), 'g')  // Chinese: match without word boundaries
+        : new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi');  // Other languages: use word boundaries
       
-      parts.forEach((part, index) => {
-        // Add the regular text
-        if (part) {
-          fragment.appendChild(document.createTextNode(part));
-        }
-        
-        // Add the translated word if there's a match
-        if (index < matches.length) {
-          const span = document.createElement('span');
-          span.className = 'linguaswap-word';
-          span.setAttribute('title', matches[index]);
-          span.textContent = translation;
-          const computedStyle = window.getComputedStyle(textNode.parentElement);
-          span.style.color = 'inherit';
-          span.style.fontSize = computedStyle.fontSize;
-          span.style.fontFamily = computedStyle.fontFamily;
-          span.style.fontWeight = computedStyle.fontWeight;
-          fragment.appendChild(span);
-        }
-      });
+      // Process all text nodes within the element
+      const textNodes = [];
+      const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: function(node) {
+            // Skip if parent is already a linguaswap-word or if text doesn't contain the word
+            if (node.parentElement.classList.contains('linguaswap-word') || !regex.test(node.textContent)) {
+              return NodeFilter.FILTER_REJECT;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        },
+        false
+      );
 
-      textNode.parentNode.replaceChild(fragment, textNode);
+      let node;
+      while (node = walker.nextNode()) {
+        textNodes.push(node);
+      }
+
+      // Replace text in all found nodes
+      textNodes.forEach(textNode => {
+        const fragment = document.createDocumentFragment();
+        const parts = textNode.textContent.split(regex);
+        const matches = textNode.textContent.match(regex) || [];
+        
+        parts.forEach((part, index) => {
+          // Add the regular text
+          if (part) {
+            fragment.appendChild(document.createTextNode(part));
+          }
+          
+          // Add the translated word if there's a match
+          if (index < matches.length) {
+            const span = document.createElement('span');
+            span.className = 'linguaswap-word';
+            span.setAttribute('title', matches[index]);
+            span.textContent = translation;
+            const computedStyle = window.getComputedStyle(textNode.parentElement);
+            span.style.color = 'inherit';
+            span.style.fontSize = computedStyle.fontSize;
+            span.style.fontFamily = computedStyle.fontFamily;
+            span.style.fontWeight = computedStyle.fontWeight;
+            fragment.appendChild(span);
+          }
+        });
+
+        textNode.parentNode.replaceChild(fragment, textNode);
+      });
     });
   });
 }

@@ -88,12 +88,12 @@ Key Features:
    ```
 
 ## Styling Implementation
-- Translated words inherit all styles from original text
+- Translated words inherit all styles from original text, with only an underline added to indicate the translation
 
 ## Current Considerations
 
 ### Features
-- Supports multiple language pairs
+- Supports multiple language pairs, with each language pair having its own word list
 - Real-time translation toggle
 - Persistent storage of word translations list
 - Manage word translations (edit/delete)
@@ -102,12 +102,10 @@ Key Features:
 - Uses `computedStyle` for style inheritance
 - Maintains document flow
 - Preserves text node structure
-- Efficient DOM manipulation
-- Responsive to page style changes
 
 ## Future Enhancements
 - Support import of word lists (e.g. TOEFL, IELTS, etc.)
 - Easier management of word lists (sorting, pagination, searching, etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
-- Add contextual translation using LLMs
+- Add contextual translation using LLMs for word conjugations
 - Unified hosted translation API for users without a translation API key
