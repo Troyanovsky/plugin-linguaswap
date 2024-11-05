@@ -49,8 +49,9 @@ Key Features:
 - Tab-based interface (Settings/Word List)
 - Language pair selection
 - DeepL API key management
-- Word list management with delete functionality
+- Word list management
 - Enable/disable toggle
+- GitHub and Buy Me a Coffee links
 
 ## Data Structure
 
@@ -87,30 +88,15 @@ Key Features:
    ```
 
 ## Styling Implementation
-- Translated words inherit all styles from original text:
-  - Font family
-  - Font size
-  - Font weight
-  - Text color
-  - Line height
-  - Other text properties
-- Only adds:
-  - Dashed underline (using currentColor)
-  - Help cursor on hover
-- Ensures visual consistency with the original page design
-- Minimal CSS footprint
-- Non-intrusive visual indicators
+- Translated words inherit all styles from original text
 
 ## Current Considerations
 
-### Strengths
+### Features
 - Supports multiple language pairs
 - Real-time translation toggle
-- Persistent storage
-- Clean UI with modern design
-- Seamless style integration
-- Minimal visual disruption
-- Consistent user experience across websites
+- Persistent storage of word translations list
+- Manage word translations (edit/delete)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance
@@ -120,10 +106,8 @@ Key Features:
 - Responsive to page style changes
 
 ## Future Enhancements
-- Manage word translations (edit)
 - Support import of word lists (e.g. TOEFL, IELTS, etc.)
 - Easier management of word lists (sorting, pagination, searching, etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
 - Add contextual translation using LLMs
-- Enhanced error robustness
 - Unified hosted translation API for users without a translation API key
