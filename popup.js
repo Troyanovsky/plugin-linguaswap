@@ -180,7 +180,23 @@ function addWordToList(word, translation, container, langPairKey) {
     delete wordLists[langPairKey][word];
     await chrome.storage.local.set({ wordLists });
     wordItem.remove();
-    showNotification('Word deleted successfully! Reload the page to see the changes.');
+
+    // Notify content script to update the page
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs[0]) {
+        await chrome.tabs.sendMessage(tabs[0].id, {
+          type: 'wordDeleted',
+          word,
+          langPairKey
+        });
+      }
+    } catch (error) {
+      // Ignore the connection error as it's expected in some cases
+      console.debug('Content script communication error (expected):', error);
+    }
+
+    showNotification('Word deleted successfully!');
   });
 
   actionsDiv.appendChild(editBtn);

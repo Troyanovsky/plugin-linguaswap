@@ -12,6 +12,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
       });
     }
+  } else if (message.type === 'wordDeleted') {
+    if (isSwappingEnabled) {
+      chrome.storage.local.get('settings', ({ settings }) => {
+        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        if (message.langPairKey === currentLangPair) {
+          // Restore original text for deleted word
+          document.querySelectorAll('.linguaswap-word').forEach(el => {
+            if (el.getAttribute('title').toLowerCase() === message.word.toLowerCase()) {
+              el.outerHTML = el.getAttribute('title');
+            }
+          });
+        }
+      });
+    }
   } else if (message.type === 'showNotification') {
     showNotification(message.message);
   } else if (message.type === 'toggleSwap') {
