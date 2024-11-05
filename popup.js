@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Load settings and word list
-  const { settings = {}, wordList = {} } = await chrome.storage.local.get(['settings', 'wordList']);
+  // Load settings and word lists
+  const { settings = {}, wordLists = {} } = await chrome.storage.local.get(['settings', 'wordLists']);
   
   // Initialize default settings if they don't exist
   const defaultSettings = {
@@ -59,6 +59,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (targetLanguageSelect) targetLanguageSelect.value = currentSettings.targetLanguage;
   if (deeplApiKeyInput) deeplApiKeyInput.value = currentSettings.deeplApiKey;
 
+  // Function to update word list display
+  const updateWordList = () => {
+    const wordListContainer = document.getElementById('wordList');
+    if (wordListContainer) {
+      // Clear existing words
+      wordListContainer.innerHTML = '';
+      
+      // Get current language pair's word list
+      const langPairKey = `${currentSettings.defaultLanguage}-${currentSettings.targetLanguage}`;
+      const currentWordList = wordLists[langPairKey] || {};
+      
+      // Add words for current language pair
+      Object.entries(currentWordList).forEach(([word, translation]) => {
+        addWordToList(word, translation, wordListContainer, langPairKey);
+      });
+    }
+  };
+
   // Save settings
   const saveButton = document.getElementById('saveSettings');
   if (saveButton) {
@@ -71,19 +89,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       await chrome.storage.local.set({ settings: newSettings });
       showNotification('Settings saved successfully!');
+      
+      // Update word list display for new language pair
+      updateWordList();
     });
   }
 
-  // Populate word list
-  const wordListContainer = document.getElementById('wordList');
-  if (wordListContainer) {
-    for (const [word, translation] of Object.entries(wordList)) {
-      addWordToList(word, translation, wordListContainer);
-    }
-  }
+  // Add event listeners for language changes
+  defaultLanguageSelect.addEventListener('change', updateWordList);
+  targetLanguageSelect.addEventListener('change', updateWordList);
+
+  // Initial word list population
+  updateWordList();
 });
 
-function addWordToList(word, translation, container) {
+function addWordToList(word, translation, container, langPairKey) {
   const wordItem = document.createElement('div');
   wordItem.className = 'word-item';
   
@@ -95,9 +115,9 @@ function addWordToList(word, translation, container) {
   deleteBtn.className = 'delete-btn';
   deleteBtn.textContent = 'Delete';
   deleteBtn.addEventListener('click', async () => {
-    const { wordList } = await chrome.storage.local.get('wordList');
-    delete wordList[word];
-    await chrome.storage.local.set({ wordList });
+    const { wordLists } = await chrome.storage.local.get('wordLists');
+    delete wordLists[langPairKey][word];
+    await chrome.storage.local.set({ wordLists });
     wordItem.remove();
     showNotification('Word deleted successfully!');
   });

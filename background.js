@@ -7,7 +7,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
   // Initialize storage with default settings if not exists
-  chrome.storage.local.get(['settings', 'wordList'], (result) => {
+  chrome.storage.local.get(['settings', 'wordLists'], (result) => {
     if (!result.settings) {
       chrome.storage.local.set({
         settings: {
@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener(() => {
           targetLanguage: '',
           deeplApiKey: ''
         },
-        wordList: {}
+        wordLists: {}
       });
     }
   });
@@ -26,8 +26,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'addToLinguaSwap') {
     const selectedText = info.selectionText.toLowerCase().trim();
     
-    // Get settings and existing word list
-    const { settings, wordList } = await chrome.storage.local.get(['settings', 'wordList']);
+    // Get settings and existing word lists
+    const { settings, wordLists = {} } = await chrome.storage.local.get(['settings', 'wordLists']);
     
     if (!settings.deeplApiKey) {
       // Notify user to set up API key
@@ -47,15 +47,24 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         settings.deeplApiKey
       );
 
-      // Add to word list
-      wordList[selectedText] = translation;
-      await chrome.storage.local.set({ wordList });
+      // Create language pair key
+      const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+      
+      // Initialize word list for this language pair if it doesn't exist
+      if (!wordLists[langPairKey]) {
+        wordLists[langPairKey] = {};
+      }
+
+      // Add to specific language pair word list
+      wordLists[langPairKey][selectedText] = translation;
+      await chrome.storage.local.set({ wordLists });
 
       // Notify content script to update the page
       chrome.tabs.sendMessage(tab.id, {
         type: 'wordAdded',
         word: selectedText,
-        translation
+        translation,
+        langPairKey
       });
     } catch (error) {
       chrome.tabs.sendMessage(tab.id, {

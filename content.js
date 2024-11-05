@@ -5,7 +5,12 @@ let isSwappingEnabled = true;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'wordAdded') {
     if (isSwappingEnabled) {
-      replaceWords(message.word, message.translation);
+      chrome.storage.local.get('settings', ({ settings }) => {
+        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        if (message.langPairKey === currentLangPair) {
+          replaceWords(message.word, message.translation);
+        }
+      });
     }
   } else if (message.type === 'showNotification') {
     showNotification(message.message);
@@ -13,10 +18,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     isSwappingEnabled = message.isEnabled;
     if (isSwappingEnabled) {
       // Re-apply all translations
-      chrome.storage.local.get('wordList', ({ wordList }) => {
-        if (wordList) {
-          Object.entries(wordList).forEach(([word, translation]) => {
-            replaceWords(word, translation);
+      chrome.storage.local.get('wordLists', ({ wordLists }) => {
+        if (wordLists) {
+          Object.entries(wordLists).forEach(([langPairKey, currentWordList]) => {
+            Object.entries(currentWordList).forEach(([word, translation]) => {
+              replaceWords(word, translation);
+            });
           });
         }
       });
@@ -30,10 +37,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Initial page load
-chrome.storage.local.get(['wordList', 'isEnabled'], ({ wordList, isEnabled = true }) => {
+chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = {}, isEnabled = true, settings }) => {
   isSwappingEnabled = isEnabled;
-  if (wordList && isSwappingEnabled) {
-    Object.entries(wordList).forEach(([word, translation]) => {
+  if (isSwappingEnabled && settings) {
+    const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+    const currentWordList = wordLists[langPairKey] || {};
+    Object.entries(currentWordList).forEach(([word, translation]) => {
       replaceWords(word, translation);
     });
   }
