@@ -31,11 +31,13 @@ Key Functions:
 - Handles webpage text replacement
 - Manages translation display/removal
 - Controls toggle state
+- Maintains original page styling
 
 Key Functions:
-- `replaceWords()`: Replaces text with translations
+- `replaceWords()`: Replaces text with translations while preserving styles
 - `shouldSkipElement()`: Filters elements to modify
 - Message listeners for word additions and toggle changes
+- Style inheritance handling for translated words
 
 ### 3. Popup Interface (`popup.html`, `popup.js`, `popup.css`)
 - Settings management
@@ -81,8 +83,23 @@ Key Features:
 2. **Translation Display**:
    ```
    Page Load → Get Settings/Words → Process Text Nodes → 
-   Replace Words → Apply Styling
+   Replace Words → Apply Inherited Styling
    ```
+
+## Styling Implementation
+- Translated words inherit all styles from original text:
+  - Font family
+  - Font size
+  - Font weight
+  - Text color
+  - Line height
+  - Other text properties
+- Only adds:
+  - Dashed underline (using currentColor)
+  - Help cursor on hover
+- Ensures visual consistency with the original page design
+- Minimal CSS footprint
+- Non-intrusive visual indicators
 
 ## Current Considerations
 
@@ -91,8 +108,20 @@ Key Features:
 - Real-time translation toggle
 - Persistent storage
 - Clean UI with modern design
+- Seamless style integration
+- Minimal visual disruption
+- Consistent user experience across websites
+
+### Technical Implementation
+- Uses `computedStyle` for style inheritance
+- Maintains document flow
+- Preserves text node structure
+- Efficient DOM manipulation
+- Responsive to page style changes
 
 ## Future Enhancements
 - Support import of word lists (e.g. TOEFL, IELTS, etc.)
+- Easier management of word lists (sorting, pagination, searching, etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
 - Enhanced error robustness
+- Unified hosted translation API for users without a translation API key
