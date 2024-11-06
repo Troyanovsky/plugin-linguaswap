@@ -62,6 +62,7 @@ chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = 
   }
 });
 
+// Function to replace words with translations
 function replaceWords(word, translation) {
   const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p');
   
@@ -132,6 +133,7 @@ function replaceWords(word, translation) {
   });
 }
 
+// Function to determine if an element should be skipped, e.g. if it's a script, style, input, or textarea
 function shouldSkipElement(element) {
   // Skip elements that shouldn't be modified
   const skipTags = ['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA'];
@@ -139,6 +141,7 @@ function shouldSkipElement(element) {
          element.closest('input, textarea, script, style');
 }
 
+// Function to show a notification
 function showNotification(message) {
   const notification = document.createElement('div');
   notification.style.cssText = `

@@ -19,7 +19,7 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn" data-tab="wordlist">
+            <button class="tab-btn active" data-tab="wordlist">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                     <rect x="9" y="3" width="6" height="4" rx="2" />
@@ -29,7 +29,7 @@
                 </svg>
                 Word List
             </button>
-            <button class="tab-btn active" data-tab="settings">
+            <button class="tab-btn" data-tab="settings">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                     <path
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Add the tab content sections -->
-        <div class="tab-content active" id="settings">
+        <div class="tab-content" id="settings">
             <div class="form-group">
                 <label for="defaultLanguage">Default Language</label>
                 <select id="defaultLanguage">
@@ -93,7 +93,7 @@
             </div>
         </div>
 
-        <div class="tab-content" id="wordlist">
+        <div class="tab-content active" id="wordlist">
             <div id="wordList" class="word-list">
                 <!-- Words will be populated here -->
             </div>

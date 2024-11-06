@@ -96,7 +96,7 @@ Key Features:
 - Supports multiple language pairs, with each language pair having its own word list
 - Real-time translation toggle
 - Persistent storage of word translations list
-- Manage word translations (edit/delete)
+- Manage word translations (sort/edit/delete)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance

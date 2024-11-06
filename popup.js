@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Add this near the top of the DOMContentLoaded listener
+  // Toggle translation button
   const swapToggle = document.getElementById('swapToggle');
   
   // Load toggle state
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const langPairKey = `${currentSettings.defaultLanguage}-${currentSettings.targetLanguage}`;
       const currentWordList = wordLists[langPairKey] || {};
       
-      // Check if the word list is empty
+      // Check if the word list is empty, and if so, display an empty state
       if (Object.keys(currentWordList).length === 0) {
         const emptyState = document.createElement('div');
         emptyState.className = 'empty-state';
@@ -84,11 +84,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         wordListContainer.appendChild(emptyState);
       } else {
-        // Add actions container (for export and sort buttons)
+        // Actions container (for export and sort buttons)
         const actionsContainer = document.createElement('div');
         actionsContainer.className = 'list-actions';
         
-        // Add export button
+        // Export button
         const exportBtn = document.createElement('button');
         exportBtn.className = 'action-btn export-btn';
         exportBtn.innerHTML = `
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         
         exportBtn.addEventListener('click', () => {
-          // Convert word list to CSV content
+          // Convert word list to CSV content for export
           const csvContent = Object.entries(currentWordList)
             .map(([word, translation]) => `${word},${translation}`)
             .join('\n');
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           showNotification('Word list exported successfully!');
         });
         
-        // Add sort button
+        // Sort button
         const sortBtn = document.createElement('button');
         sortBtn.className = 'action-btn sort-btn';
         sortBtn.innerHTML = `
@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateWordList();
 });
 
+// Function to add a word to the word list
 function addWordToList(word, translation, container, langPairKey) {
   const wordItem = document.createElement('div');
   wordItem.className = 'word-item';
@@ -228,6 +229,7 @@ function addWordToList(word, translation, container, langPairKey) {
     saveBtn.textContent = '💾';  // floppy disk emoji
     saveBtn.title = "Save translation";
 
+    // Save button
     saveBtn.addEventListener('click', async () => {
       const newTranslation = inputField.value.trim();
       if (newTranslation) {
@@ -263,6 +265,7 @@ function addWordToList(word, translation, container, langPairKey) {
     inputField.focus();
   });
 
+  // Delete button
   deleteBtn.addEventListener('click', async () => {
     const { wordLists } = await chrome.storage.local.get('wordLists');
     delete wordLists[langPairKey][word];
@@ -294,6 +297,7 @@ function addWordToList(word, translation, container, langPairKey) {
   container.appendChild(wordItem);
 }
 
+// Function to show a notification
 function showNotification(message) {
   const notification = document.createElement('div');
   notification.style.cssText = `

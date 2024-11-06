@@ -41,7 +41,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-// Handle context menu clicks
+// Handle context menu clicks: add selected text to LinguaSwap word list, translate it, and notify content script
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'addToLinguaSwap') {
     const selectedText = info.selectionText.toLowerCase().trim();
@@ -52,6 +52,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     debug('Current settings:', settings);
     debug('Current wordLists:', wordLists);
     
+    // Check if DeepL API key is set
     if (!settings.deeplApiKey) {
       debug('No API key found');
       chrome.tabs.sendMessage(tab.id, {
@@ -110,6 +111,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+// Function to translate a word using the DeepL API
 async function translateWord(text, sourceLang, targetLang, apiKey) {
   debug('translateWord called with:', { text, sourceLang, targetLang });
   
