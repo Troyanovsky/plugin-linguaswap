@@ -84,8 +84,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         wordListContainer.appendChild(emptyState);
       } else {
-        // Add words for current language pair
-        Object.entries(currentWordList).forEach(([word, translation]) => {
+        // Add sort button container
+        const sortContainer = document.createElement('div');
+        sortContainer.className = 'sort-container';
+        
+        const sortBtn = document.createElement('button');
+        sortBtn.className = 'sort-btn';
+        sortBtn.innerHTML = `
+        ↕️ A → Z
+        `;
+        
+        let isAscending = true;
+        sortBtn.addEventListener('click', () => {
+          isAscending = !isAscending;
+          sortBtn.innerHTML = `
+            ↕️ ${isAscending ? 'A → Z' : 'Z → A'}
+          `;
+          
+          // Sort and update the word list
+          const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => {
+            return isAscending ? a.localeCompare(b) : b.localeCompare(a);
+          });
+          
+          // Clear existing words (except sort button)
+          const sortContainerElement = wordListContainer.querySelector('.sort-container');
+          wordListContainer.innerHTML = '';
+          wordListContainer.appendChild(sortContainerElement);
+          
+          // Add sorted words
+          sortedEntries.forEach(([word, translation]) => {
+            addWordToList(word, translation, wordListContainer, langPairKey);
+          });
+        });
+        
+        sortContainer.appendChild(sortBtn);
+        wordListContainer.appendChild(sortContainer);
+        
+        // Add words for current language pair (initially sorted A→Z)
+        const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => a.localeCompare(b));
+        sortedEntries.forEach(([word, translation]) => {
           addWordToList(word, translation, wordListContainer, langPairKey);
         });
       }

@@ -328,3 +328,33 @@ input:checked + .toggle-slider:before {
   font-size: 0.85rem;
   color: #9CA3AF;
 }
+
+.sort-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sort-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.sort-btn svg {
+  stroke: currentColor;
+}
