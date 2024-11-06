@@ -84,12 +84,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         wordListContainer.appendChild(emptyState);
       } else {
-        // Add sort button container
-        const sortContainer = document.createElement('div');
-        sortContainer.className = 'sort-container';
+        // Add actions container (for export and sort buttons)
+        const actionsContainer = document.createElement('div');
+        actionsContainer.className = 'list-actions';
         
+        // Add export button
+        const exportBtn = document.createElement('button');
+        exportBtn.className = 'action-btn export-btn';
+        exportBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        `;
+        
+        exportBtn.addEventListener('click', () => {
+          // Convert word list to CSV content
+          const csvContent = Object.entries(currentWordList)
+            .map(([word, translation]) => `${word},${translation}`)
+            .join('\n');
+          
+          // Create blob and download link
+          const blob = new Blob([`${langPairKey}\n${csvContent}`], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `linguaswap-wordlist-${langPairKey}.csv`;
+          
+          // Trigger download
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          
+          showNotification('Word list exported successfully!');
+        });
+        
+        // Add sort button
         const sortBtn = document.createElement('button');
-        sortBtn.className = 'sort-btn';
+        sortBtn.className = 'action-btn sort-btn';
         sortBtn.innerHTML = `
         ↕️ A → Z
         `;
@@ -117,8 +152,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         });
         
-        sortContainer.appendChild(sortBtn);
-        wordListContainer.appendChild(sortContainer);
+        actionsContainer.appendChild(exportBtn);
+        actionsContainer.appendChild(sortBtn);
+        wordListContainer.appendChild(actionsContainer);
         
         // Add words for current language pair (initially sorted A→Z)
         const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => a.localeCompare(b));

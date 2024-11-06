@@ -358,3 +358,52 @@ input:checked + .toggle-slider:before {
 .sort-btn svg {
   stroke: currentColor;
 }
+
+.list-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.action-btn svg {
+  stroke: currentColor;
+}
+
+.export-btn {
+  background-color: #dbeafe;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.export-btn:hover {
+  background-color: #bfdbfe;
+}
+
+/* Update existing sort-btn styles to match new action-btn base styles */
+.sort-btn {
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #374151;
+}
