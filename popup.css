@@ -303,3 +303,28 @@ input:checked + .toggle-slider:before {
   font-size: 0.9rem;
   width: 150px;
 }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: #6B7280;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.empty-state small {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+}
