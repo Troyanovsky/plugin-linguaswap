@@ -7,11 +7,16 @@
 body {
   font-family: 'Inter', sans-serif;
   color: #1a1a1a;
+  height: 600px;
+  overflow: hidden;
 }
 
 .container {
   width: 350px;
   padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
@@ -63,10 +68,13 @@ h1 {
 /* Tab Content */
 .tab-content {
   display: none;
+  height: 100%;
+  overflow: hidden;
 }
 
 .tab-content.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Form Elements */
@@ -116,8 +124,9 @@ select:focus, input:focus {
 }
 
 .word-list {
-  max-height: 200px;
+  flex: 1;
   overflow-y: auto;
+  padding-right: 4px;
 }
 
 .word-item {
@@ -406,4 +415,23 @@ input:checked + .toggle-slider:before {
   background-color: #f3f4f6;
   border-color: #e5e7eb;
   color: #374151;
+}
+
+/* Style the scrollbar */
+.word-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.word-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.word-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.word-list::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
 }

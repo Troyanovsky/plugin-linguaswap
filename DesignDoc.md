@@ -105,7 +105,7 @@ Key Features:
 
 ## Future Enhancements
 - Support import of word lists (e.g. TOEFL, IELTS, etc.)
-- Easier management of word lists (sorting, pagination, searching, removal etc.)
+- Easier management of word lists (pagination, searching etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
 - Add contextual translation using LLMs for word conjugations
 - Unified hosted translation API for users without a translation API key
