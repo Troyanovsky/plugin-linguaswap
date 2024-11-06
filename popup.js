@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Get current language pair's word list
       const langPairKey = `${currentSettings.defaultLanguage}-${currentSettings.targetLanguage}`;
-      const currentWordList = wordLists[langPairKey] || {};
+      let currentWordList = wordLists[langPairKey] || {};
       
       // Check if the word list is empty, and if so, display an empty state
       if (Object.keys(currentWordList).length === 0) {
@@ -84,6 +84,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         wordListContainer.appendChild(emptyState);
       } else {
+        // Add search container
+        const searchContainer = document.createElement('div');
+        searchContainer.className = 'search-container';
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.className = 'search-input';
+        searchInput.placeholder = 'Search words...';
+        searchContainer.appendChild(searchInput);
+        wordListContainer.appendChild(searchContainer);
+
         // Actions container (for export and sort buttons)
         const actionsContainer = document.createElement('div');
         actionsContainer.className = 'list-actions';
@@ -137,30 +147,50 @@ document.addEventListener('DOMContentLoaded', async () => {
           `;
           
           // Sort and update the word list
-          const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => {
-            return isAscending ? a.localeCompare(b) : b.localeCompare(a);
-          });
-          
-          // Clear existing words (except sort button)
-          const sortContainerElement = wordListContainer.querySelector('.sort-container');
-          wordListContainer.innerHTML = '';
-          wordListContainer.appendChild(sortContainerElement);
-          
-          // Add sorted words
-          sortedEntries.forEach(([word, translation]) => {
-            addWordToList(word, translation, wordListContainer, langPairKey);
-          });
+          const wordsContainer = wordListContainer.querySelector('.words-container');
+          if (wordsContainer) {
+            wordsContainer.innerHTML = '';
+            
+            const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => {
+              return isAscending ? a.localeCompare(b) : b.localeCompare(a);
+            });
+            
+            sortedEntries.forEach(([word, translation]) => {
+              addWordToList(word, translation, wordsContainer, langPairKey, currentWordList, filterAndDisplayWords, searchInput);
+            });
+          }
         });
         
         actionsContainer.appendChild(exportBtn);
         actionsContainer.appendChild(sortBtn);
         wordListContainer.appendChild(actionsContainer);
         
-        // Add words for current language pair (initially sorted A→Z)
-        const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => a.localeCompare(b));
-        sortedEntries.forEach(([word, translation]) => {
-          addWordToList(word, translation, wordListContainer, langPairKey);
+        // Create a container for the filtered words
+        const wordsContainer = document.createElement('div');
+        wordsContainer.className = 'words-container';
+        wordListContainer.appendChild(wordsContainer);
+
+        // Function to filter and display words
+        const filterAndDisplayWords = (searchTerm = '') => {
+          wordsContainer.innerHTML = '';
+          const sortedEntries = Object.entries(currentWordList)
+            .filter(([word]) => 
+              word.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .sort(([a], [b]) => isAscending ? a.localeCompare(b) : b.localeCompare(a));
+
+          sortedEntries.forEach(([word, translation]) => {
+            addWordToList(word, translation, wordsContainer, langPairKey, currentWordList, filterAndDisplayWords, searchInput);
+          });
+        };
+
+        // Add search input listener
+        searchInput.addEventListener('input', (e) => {
+          filterAndDisplayWords(e.target.value);
         });
+
+        // Initial display of all words
+        filterAndDisplayWords();
       }
     }
   };
@@ -192,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Function to add a word to the word list
-function addWordToList(word, translation, container, langPairKey) {
+function addWordToList(word, translation, container, langPairKey, currentWordList, filterAndDisplayWords, searchInput) {
   const wordItem = document.createElement('div');
   wordItem.className = 'word-item';
   
@@ -215,6 +245,7 @@ function addWordToList(word, translation, container, langPairKey) {
   deleteBtn.textContent = '🗑️';  // trash bin emoji
   deleteBtn.title = "Delete word";
 
+  // Edit button
   editBtn.addEventListener('click', () => {
     // Replace text with input field
     const inputField = document.createElement('input');
@@ -229,13 +260,19 @@ function addWordToList(word, translation, container, langPairKey) {
     saveBtn.textContent = '💾';  // floppy disk emoji
     saveBtn.title = "Save translation";
 
-    // Save button
+    // Save button for editing
     saveBtn.addEventListener('click', async () => {
       const newTranslation = inputField.value.trim();
       if (newTranslation) {
         const { wordLists } = await chrome.storage.local.get('wordLists');
         wordLists[langPairKey][word] = newTranslation;
         await chrome.storage.local.set({ wordLists });
+
+        // Update the current word list
+        currentWordList[word] = newTranslation;
+
+        // Refresh the filtered display
+        filterAndDisplayWords(searchInput.value);
 
         // Update display
         wordText.textContent = `${word} : ${newTranslation}`;
@@ -270,6 +307,13 @@ function addWordToList(word, translation, container, langPairKey) {
     const { wordLists } = await chrome.storage.local.get('wordLists');
     delete wordLists[langPairKey][word];
     await chrome.storage.local.set({ wordLists });
+    
+    // Update the current word list
+    delete currentWordList[word];
+
+    // Refresh the filtered display
+    filterAndDisplayWords(searchInput.value);
+
     wordItem.remove();
 
     // Notify content script to update the page

@@ -435,3 +435,25 @@ input:checked + .toggle-slider:before {
 .word-list::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
 }
+
+.search-container {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: #f9fafb;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
