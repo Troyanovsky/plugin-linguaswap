@@ -8,15 +8,11 @@ body {
   font-family: 'Inter', sans-serif;
   color: #1a1a1a;
   height: 600px;
-  overflow: hidden;
 }
 
 .container {
   width: 350px;
   padding: 20px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 h1 {
@@ -68,13 +64,10 @@ h1 {
 /* Tab Content */
 .tab-content {
   display: none;
-  height: 100%;
-  overflow: hidden;
 }
 
 .tab-content.active {
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 /* Form Elements */
@@ -124,8 +117,6 @@ select:focus, input:focus {
 }
 
 .word-list {
-  flex: 1;
-  overflow-y: auto;
   padding-right: 4px;
 }
 
@@ -419,21 +410,19 @@ input:checked + .toggle-slider:before {
 
 /* Style the scrollbar */
 .word-list::-webkit-scrollbar {
-  width: 8px;
+  display: none;
 }
 
 .word-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  display: none;
 }
 
 .word-list::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  display: none;
 }
 
 .word-list::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  display: none;
 }
 
 .search-container {

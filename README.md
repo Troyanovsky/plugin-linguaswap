@@ -12,7 +12,7 @@ LinguaSwap is a Chrome extension designed to make language learning an integral 
 ## Getting Started
 
 1. Install LinguaSwap from the Chrome Web Store.
-2. Open LinguaSwap from your extensions to set up your default and target languages and translation API.
+2. Open LinguaSwap from your extensions to set up your default and target languages.
 3. Start browsing, adding words, and expanding your vocabulary!
 
 ## License

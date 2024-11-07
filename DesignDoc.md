@@ -90,6 +90,37 @@ Key Features:
 ## Styling Implementation
 - Translated words inherit all styles from original text, with only an underline added to indicate the translation
 
+## API Implementation
+
+**Endpoint**:  
+`GET https://plugin-linguaswap-backend.vercel.app/api/translate`
+
+### Query Parameters
+- **text** (string, required): Text to translate (max 30 characters).
+- **source_lang** (string, optional): Source language code (e.g., `EN`). Defaults to auto-detect.
+- **target_lang** (string, required): Target language code (e.g., `DE`).
+- **provider** (string, optional, default: `deepl`): Translation provider. Only `deepl` is supported as of now.
+
+### Responses
+- **200 OK**
+  ```json
+  {
+    "translations": [
+      { "text": "translated_text_here" }
+    ]
+  }
+  ```
+- **Error Codes**
+  - `401 Unauthorized`: Origin not allowed.
+  - `405 Method Not Allowed`: Only `GET` allowed.
+  - `400 Bad Request`: Invalid parameters or text too long.
+  - `500 Internal Server Error`: Translation failed.
+
+### Example Request
+```bash
+curl -X GET "https://plugin-linguaswap-backend.vercel.app/api/translate?text=Hello&target_lang=DE"
+```
+
 ## Current Considerations
 
 ### Features
@@ -97,6 +128,7 @@ Key Features:
 - Real-time translation toggle
 - Persistent storage of word translations list
 - Manage word translations (sort/edit/delete)
+- Unified hosted translation API for users without a translation API key (Added Nov 7, 2024)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance
@@ -108,6 +140,5 @@ Key Features:
 - Easier management of word lists (pagination, searching etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
 - Add contextual translation using LLMs for word conjugations
-- Unified hosted translation API for users without a translation API key
 - Word frequency statistics
 - Multilingual UI

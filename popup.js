@@ -43,8 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize default settings if they don't exist
   const defaultSettings = {
     defaultLanguage: 'EN',
-    targetLanguage: 'ES',
-    deeplApiKey: ''
+    targetLanguage: 'DE'
   };
 
   // Merge existing settings with defaults
@@ -53,11 +52,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Populate settings
   const defaultLanguageSelect = document.getElementById('defaultLanguage');
   const targetLanguageSelect = document.getElementById('targetLanguage');
-  const deeplApiKeyInput = document.getElementById('deeplApiKey');
 
   if (defaultLanguageSelect) defaultLanguageSelect.value = currentSettings.defaultLanguage;
   if (targetLanguageSelect) targetLanguageSelect.value = currentSettings.targetLanguage;
-  if (deeplApiKeyInput) deeplApiKeyInput.value = currentSettings.deeplApiKey;
 
   // Function to update word list display
   const updateWordList = () => {
@@ -201,8 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveButton.addEventListener('click', async () => {
       const newSettings = {
         defaultLanguage: defaultLanguageSelect.value,
-        targetLanguage: targetLanguageSelect.value,
-        deeplApiKey: deeplApiKeyInput.value
+        targetLanguage: targetLanguageSelect.value
       };
 
       await chrome.storage.local.set({ settings: newSettings });
