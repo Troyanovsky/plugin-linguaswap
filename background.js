@@ -30,8 +30,7 @@ chrome.runtime.onInstalled.addListener(() => {
       const initialSettings = {
         settings: {
           defaultLanguage: '',
-          targetLanguage: '',
-          deeplApiKey: ''
+          targetLanguage: ''
         },
         wordLists: {}
       };
@@ -51,18 +50,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const { settings, wordLists = {} } = await chrome.storage.local.get(['settings', 'wordLists']);
     debug('Current settings:', settings);
     debug('Current wordLists:', wordLists);
-    
-    // Check if DeepL API key is set
-    if (!settings.deeplApiKey) {
-      debug('No API key found');
-      chrome.tabs.sendMessage(tab.id, {
-        type: 'showNotification',
-        message: 'Please set up your DeepL API key in LinguaSwap settings by clicking the settings icon in the toolbar.'
-      });
-      return;
-    }
 
-    // Translate the word using DeepL API
+    // Translate the word using LinguaSwap API
     try {
       debug('Attempting translation', {
         text: selectedText,
@@ -73,8 +62,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       const translation = await translateWord(
         selectedText,
         settings.defaultLanguage,
-        settings.targetLanguage,
-        settings.deeplApiKey
+        settings.targetLanguage
       );
       debug('Translation result:', translation);
 
@@ -105,32 +93,43 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       debug('Translation error:', error);
       chrome.tabs.sendMessage(tab.id, {
         type: 'showNotification',
-        message: 'Translation failed. Please check your API key and try again.'
+        message: 'Translation failed.'
       });
     }
   }
 });
 
-// Function to translate a word using the DeepL API
-async function translateWord(text, sourceLang, targetLang, apiKey) {
+// Function to translate a word using the LinguaSwap API
+async function translateWord(text, sourceLang, targetLang) {
   debug('translateWord called with:', { text, sourceLang, targetLang });
   
-  const url = 'https://api-free.deepl.com/v2/translate';
+  const baseUrl = 'https://plugin-linguaswap-backend.vercel.app/api/translate';
   const params = new URLSearchParams({
     text,
-    source_lang: sourceLang,
     target_lang: targetLang,
   });
   
-  debug('API request params:', params.toString());
-
-  const response = await fetch(url, {
-    method: 'POST',
+  // Only add source_lang if it's provided (otherwise let API auto-detect)
+  if (sourceLang) {
+    params.append('source_lang', sourceLang);
+  }
+  
+  debug('API request:', {
+    url: `${baseUrl}?${params.toString()}`,
+    method: 'GET',
     headers: {
-      'Authorization': `DeepL-Auth-Key ${apiKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params
+      'Accept': 'application/json',
+      'Origin': `chrome-extension://${chrome.runtime.id}`
+    }
+  });
+
+  const url = `${baseUrl}?${params.toString()}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Origin': `chrome-extension://${chrome.runtime.id}`
+    }
   });
 
   debug('API response status:', response.status);
@@ -138,7 +137,18 @@ async function translateWord(text, sourceLang, targetLang, apiKey) {
   if (!response.ok) {
     const errorText = await response.text();
     debug('API error response:', errorText);
-    throw new Error('Translation failed');
+    
+    // More specific error handling based on status codes
+    switch (response.status) {
+      case 400:
+        throw new Error('Invalid parameters or text too long (max 30 characters)');
+      case 401:
+        throw new Error('Unauthorized: Origin not allowed');
+      case 405:
+        throw new Error('Method not allowed');
+      default:
+        throw new Error('Translation failed');
+    }
   }
 
   const data = await response.json();

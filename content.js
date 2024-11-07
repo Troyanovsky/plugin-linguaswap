@@ -64,7 +64,7 @@ chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = 
 
 // Function to replace words with translations
 function replaceWords(word, translation) {
-  const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p');
+  const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, li');
   
   // Get current settings to check language
   chrome.storage.local.get('settings', ({ settings }) => {

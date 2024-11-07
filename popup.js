@@ -196,16 +196,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   const saveButton = document.getElementById('saveSettings');
   if (saveButton) {
     saveButton.addEventListener('click', async () => {
+      const defaultLang = defaultLanguageSelect.value;
+      const targetLang = targetLanguageSelect.value;
+
+      // Check if languages are the same, only possible if both are English
+      if (defaultLang === 'EN' && targetLang === 'EN-US') {
+        showNotification('Default and target languages cannot be the same!', 'error');
+        return;
+      }
+
       const newSettings = {
-        defaultLanguage: defaultLanguageSelect.value,
-        targetLanguage: targetLanguageSelect.value
+        defaultLanguage: defaultLang,
+        targetLanguage: targetLang
       };
 
       await chrome.storage.local.set({ settings: newSettings });
-      showNotification('Settings saved successfully!');
+      
+      // Update currentSettings before updating word list
+      Object.assign(currentSettings, newSettings);
       
       // Update word list display for new language pair
       updateWordList();
+      
+      showNotification('Settings saved successfully!');
     });
   }
 
@@ -338,14 +351,12 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
 }
 
 // Function to show a notification
-function showNotification(message) {
+function showNotification(message, type = 'success') {
   const notification = document.createElement('div');
   notification.style.cssText = `
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #10B981;
-    color: white;
     padding: 12px 20px;
     border-radius: 6px;
     font-size: 0.9rem;
@@ -355,6 +366,15 @@ function showNotification(message) {
     transform: translateY(-10px);
     transition: all 0.3s ease;
   `;
+
+  // Set colors based on type
+  if (type === 'error') {
+    notification.style.background = '#EF4444';
+  } else {
+    notification.style.background = '#10B981';
+  }
+  notification.style.color = 'white';
+  
   notification.textContent = message;
   document.body.appendChild(notification);
 
