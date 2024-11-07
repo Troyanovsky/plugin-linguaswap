@@ -292,18 +292,17 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
           const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
           if (tabs[0]) {
             await chrome.tabs.sendMessage(tabs[0].id, {
-              type: 'wordAdded',
+              type: 'wordEdited',
               word,
               translation: newTranslation,
               langPairKey
             });
           }
         } catch (error) {
-          // Ignore the connection error as it's expected in some cases
           console.debug('Content script communication error (expected):', error);
         }
 
-        showNotification('Translation updated successfully! Reload the page to see the changes.');
+        showNotification('Translation updated successfully!');
       }
     });
 

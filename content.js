@@ -3,11 +3,18 @@ let isSwappingEnabled = true;
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'wordAdded') {
+  if (message.type === 'wordAdded' || message.type === 'wordEdited') {
     if (isSwappingEnabled) {
       chrome.storage.local.get('settings', ({ settings }) => {
         const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
         if (message.langPairKey === currentLangPair) {
+          // First remove all instances of the old translation
+          document.querySelectorAll('.linguaswap-word').forEach(el => {
+            if (el.getAttribute('title').toLowerCase() === message.word.toLowerCase()) {
+              el.outerHTML = el.getAttribute('title');
+            }
+          });
+          // Then apply the new translation
           replaceWords(message.word, message.translation);
         }
       });
@@ -66,7 +73,14 @@ chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = 
 function replaceWords(word, translation) {
   const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, li');
   
-  // Get current settings to check language
+  // First, restore any existing translations of this word
+  document.querySelectorAll('.linguaswap-word').forEach(el => {
+    if (el.getAttribute('title').toLowerCase() === word.toLowerCase()) {
+      el.textContent = translation;
+    }
+  });
+
+  // Then proceed with finding and replacing new instances
   chrome.storage.local.get('settings', ({ settings }) => {
     const isChineseSource = settings?.defaultLanguage === 'ZH';
     

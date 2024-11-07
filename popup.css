@@ -17,9 +17,10 @@ body {
 
 h1 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 20px;
-  color: #1a1a1a;
+  color: #36454F;
+  font-family: 'Verdana', 'Tahoma', sans-serif;
 }
 
 /* Tabs */
