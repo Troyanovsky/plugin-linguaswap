@@ -1,3 +1,17 @@
+// Debug mode flag
+const debug_mode = false;
+
+// Debug logger
+const debug = (message, data = null) => {
+  if (debug_mode) {
+    if (data) {
+      console.log(`[LinguaSwap Debug] ${message}:`, data);
+    } else {
+      console.log(`[LinguaSwap Debug] ${message}`);
+    }
+  }
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Toggle translation button
   const swapToggle = document.getElementById('swapToggle');
@@ -419,7 +433,7 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
 
         // Notify all tabs to update their content
         const tabs = await chrome.tabs.query({});
-        console.log('Found tabs:', tabs.length);
+        debug('Found tabs:', tabs.length);
 
         const messagePromises = tabs.map(tab => 
           chrome.tabs.sendMessage(tab.id, {
@@ -428,13 +442,13 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
             translation: newTranslation,
             langPairKey
           }).catch(error => {
-            console.error('Error sending message to tab:', tab.id, error);
+            debug('Error sending message to tab:', tab.id, error);
             return null;
           })
         );
 
         await Promise.all(messagePromises);
-        console.log('Messages sent to all tabs');
+        debug('Messages sent to all tabs');
 
         showNotification('Translation updated successfully!');
       }

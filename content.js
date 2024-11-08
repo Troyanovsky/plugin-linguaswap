@@ -1,16 +1,30 @@
-// Add this at the top of content.js
+// Debug mode flag
+const debug_mode = false;
+
+// Debug logger
+const debug = (message, data = null) => {
+  if (debug_mode) {
+    if (data) {
+      console.log(`[LinguaSwap Debug] ${message}:`, data);
+    } else {
+      console.log(`[LinguaSwap Debug] ${message}`);
+    }
+  }
+};
+
+// Global flag to track if swapping is enabled
 let isSwappingEnabled = true;
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('Content script received message:', message);
+  debug('Content script received message:', message);
   
   if (message.type === 'wordAdded' || message.type === 'wordEdited') {
-    console.log('Processing word edit/add:', message);
+    debug('Processing word edit/add:', message);
     if (isSwappingEnabled) {
       chrome.storage.local.get('settings', ({ settings }) => {
         const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-        console.log('Current language pair:', currentLangPair, 'Message pair:', message.langPairKey);
+        debug('Current language pair:', currentLangPair, 'Message pair:', message.langPairKey);
         
         if (message.langPairKey === currentLangPair) {
           // First remove all instances of the old translation
@@ -21,7 +35,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           });
           // Then apply the new translation
           replaceWords(message.word, message.translation);
-          console.log('Translation updated on page');
+          debug('Translation updated on page');
         }
       });
     }
