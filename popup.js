@@ -57,7 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize default settings if they don't exist
   const defaultSettings = {
     defaultLanguage: 'EN',
-    targetLanguage: 'DE'
+    targetLanguage: 'DE',
+    provider: 'deepl'
   };
 
   // Merge existing settings with defaults
@@ -69,6 +70,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (defaultLanguageSelect) defaultLanguageSelect.value = currentSettings.defaultLanguage;
   if (targetLanguageSelect) targetLanguageSelect.value = currentSettings.targetLanguage;
+
+  // Add this after populating language selects
+  const providerBtns = document.querySelectorAll('.provider-btn');
+  providerBtns.forEach(btn => {
+    if (btn.dataset.provider === currentSettings.provider) {
+      btn.classList.add('active');
+    }
+    
+    btn.addEventListener('click', () => {
+      providerBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
 
   // Function to create empty state element
   function createEmptyState() {
@@ -331,6 +345,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveButton.addEventListener('click', async () => {
       const defaultLang = defaultLanguageSelect.value;
       const targetLang = targetLanguageSelect.value;
+      const provider = document.querySelector('.provider-btn.active').dataset.provider;
 
       // Check if languages are the same, only possible if both are English
       if (defaultLang === 'EN' && targetLang === 'EN-US') {
@@ -340,7 +355,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const newSettings = {
         defaultLanguage: defaultLang,
-        targetLanguage: targetLang
+        targetLanguage: targetLang,
+        provider
       };
 
       await chrome.storage.local.set({ settings: newSettings });

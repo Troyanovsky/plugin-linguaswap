@@ -103,10 +103,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 async function translateWord(text, sourceLang, targetLang) {
   debug('translateWord called with:', { text, sourceLang, targetLang });
   
+  // Get current settings to access the provider
+  const { settings = { provider: 'deepl' } } = await chrome.storage.local.get('settings');
+  
   const baseUrl = 'https://plugin-linguaswap-backend.vercel.app/api/translate';
   const params = new URLSearchParams({
     text,
     target_lang: targetLang,
+    provider: settings.provider
   });
   
   // Only add source_lang if it's provided (otherwise let API auto-detect)
