@@ -417,20 +417,24 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
         wordText.textContent = `${word} : ${newTranslation}`;
         actionsDiv.replaceChild(editBtn, saveBtn);
 
-        // Notify content script to update the page
-        try {
-          const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-          if (tabs[0]) {
-            await chrome.tabs.sendMessage(tabs[0].id, {
-              type: 'wordEdited',
-              word,
-              translation: newTranslation,
-              langPairKey
-            });
-          }
-        } catch (error) {
-          console.debug('Content script communication error (expected):', error);
-        }
+        // Notify all tabs to update their content
+        const tabs = await chrome.tabs.query({});
+        console.log('Found tabs:', tabs.length);
+
+        const messagePromises = tabs.map(tab => 
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'wordEdited',
+            word,
+            translation: newTranslation,
+            langPairKey
+          }).catch(error => {
+            console.error('Error sending message to tab:', tab.id, error);
+            return null;
+          })
+        );
+
+        await Promise.all(messagePromises);
+        console.log('Messages sent to all tabs');
 
         showNotification('Translation updated successfully!');
       }
@@ -454,20 +458,17 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
 
     wordItem.remove();
 
-    // Notify content script to update the page
-    try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs[0]) {
-        await chrome.tabs.sendMessage(tabs[0].id, {
-          type: 'wordDeleted',
-          word,
-          langPairKey
-        });
-      }
-    } catch (error) {
-      // Ignore the connection error as it's expected in some cases
-      console.debug('Content script communication error (expected):', error);
-    }
+    // Notify all tabs to update the page
+    const tabs = await chrome.tabs.query({});
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, {
+        type: 'wordDeleted',
+        word,
+        langPairKey
+      }).catch(() => {
+        // Ignore errors for inactive tabs
+      });
+    });
 
     showNotification('Word deleted successfully!');
   });

@@ -3,10 +3,15 @@ let isSwappingEnabled = true;
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('Content script received message:', message);
+  
   if (message.type === 'wordAdded' || message.type === 'wordEdited') {
+    console.log('Processing word edit/add:', message);
     if (isSwappingEnabled) {
       chrome.storage.local.get('settings', ({ settings }) => {
         const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        console.log('Current language pair:', currentLangPair, 'Message pair:', message.langPairKey);
+        
         if (message.langPairKey === currentLangPair) {
           // First remove all instances of the old translation
           document.querySelectorAll('.linguaswap-word').forEach(el => {
@@ -16,6 +21,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           });
           // Then apply the new translation
           replaceWords(message.word, message.translation);
+          console.log('Translation updated on page');
         }
       });
     }
