@@ -90,12 +90,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     return { searchContainer, searchInput };
   }
 
-  // Function to create action buttons
-  function createActionButtons(langPairKey, currentWordList, filterAndDisplayWords, searchInput) {
-    const actionsContainer = document.createElement('div');
-    actionsContainer.className = 'list-actions';
-    
-    // Add import button
+  // Function to create import button
+  function createImportButton(langPairKey, currentWordList, filterAndDisplayWords, searchInput) {
     const importBtn = document.createElement('button');
     importBtn.className = 'action-btn import-btn';
     importBtn.innerHTML = `
@@ -178,8 +174,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     importBtn.addEventListener('click', () => {
       fileInput.click();
     });
-    
-    // Export button
+
+    return importBtn;
+  }
+
+  // Function to create export button
+  function createExportButton(langPairKey, currentWordList) {
     const exportBtn = document.createElement('button');
     exportBtn.className = 'action-btn export-btn';
     exportBtn.innerHTML = `
@@ -212,8 +212,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       showNotification('Word list exported successfully!');
     });
-    
-    // Sort button
+
+    return exportBtn;
+  }
+
+  // Function to create sort button
+  function createSortButton(filterAndDisplayWords, searchInput) {
     const sortBtn = document.createElement('button');
     sortBtn.className = 'action-btn sort-btn';
     let isAscending = true;
@@ -228,12 +232,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateSortButtonText();
       filterAndDisplayWords(searchInput.value);
     });
+
+    return { sortBtn, isAscending: () => isAscending };
+  }
+
+  // Main function to create action buttons
+  function createActionButtons(langPairKey, currentWordList, filterAndDisplayWords, searchInput) {
+    const actionsContainer = document.createElement('div');
+    actionsContainer.className = 'list-actions';
     
+    // Create buttons
+    const importBtn = createImportButton(langPairKey, currentWordList, filterAndDisplayWords, searchInput);
+    const exportBtn = createExportButton(langPairKey, currentWordList);
+    const { sortBtn, isAscending } = createSortButton(filterAndDisplayWords, searchInput);
+    
+    // Add buttons to container
     actionsContainer.appendChild(importBtn);
     actionsContainer.appendChild(exportBtn);
     actionsContainer.appendChild(sortBtn);
     
-    return { actionsContainer, isAscending: () => isAscending };
+    return { actionsContainer, isAscending };
   }
 
   // Main updateWordList function
