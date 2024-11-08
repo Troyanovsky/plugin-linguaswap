@@ -71,6 +71,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     return emptyState;
   }
 
+  // Function to create search container
+  function createSearchContainer(filterAndDisplayWords) {
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'search-container';
+    
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'search-input';
+    searchInput.placeholder = 'Search words...';
+    
+    // Add search input listener
+    searchInput.addEventListener('input', (e) => {
+      filterAndDisplayWords(e.target.value);
+    });
+    
+    searchContainer.appendChild(searchInput);
+    return { searchContainer, searchInput };
+  }
+
   // Main updateWordList function
   const updateWordList = () => {
     const wordListContainer = document.getElementById('wordList');
@@ -86,14 +105,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (Object.keys(currentWordList).length === 0) {
         wordListContainer.appendChild(createEmptyState());
       } else {
+        // Create a container for the filtered words
+        const wordsContainer = document.createElement('div');
+        wordsContainer.className = 'words-container';
+        
+        // Function to filter and display words
+        const filterAndDisplayWords = (searchTerm = '') => {
+          wordsContainer.innerHTML = '';
+          const sortedEntries = Object.entries(currentWordList)
+            .filter(([word]) => 
+              word.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .sort(([a], [b]) => isAscending ? a.localeCompare(b) : b.localeCompare(a));
+
+          sortedEntries.forEach(([word, translation]) => {
+            addWordToList(word, translation, wordsContainer, langPairKey, currentWordList, filterAndDisplayWords, searchInput);
+          });
+        };
+
         // Add search container
-        const searchContainer = document.createElement('div');
-        searchContainer.className = 'search-container';
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.className = 'search-input';
-        searchInput.placeholder = 'Search words...';
-        searchContainer.appendChild(searchInput);
+        const { searchContainer, searchInput } = createSearchContainer(filterAndDisplayWords);
         wordListContainer.appendChild(searchContainer);
 
         // Actions container (for export and sort buttons)
@@ -250,30 +281,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         actionsContainer.appendChild(sortBtn);
         wordListContainer.appendChild(actionsContainer);
         
-        // Create a container for the filtered words
-        const wordsContainer = document.createElement('div');
-        wordsContainer.className = 'words-container';
         wordListContainer.appendChild(wordsContainer);
-
-        // Function to filter and display words
-        const filterAndDisplayWords = (searchTerm = '') => {
-          wordsContainer.innerHTML = '';
-          const sortedEntries = Object.entries(currentWordList)
-            .filter(([word]) => 
-              word.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .sort(([a], [b]) => isAscending ? a.localeCompare(b) : b.localeCompare(a));
-
-          sortedEntries.forEach(([word, translation]) => {
-            addWordToList(word, translation, wordsContainer, langPairKey, currentWordList, filterAndDisplayWords, searchInput);
-          });
-        };
-
-        // Add search input listener
-        searchInput.addEventListener('input', (e) => {
-          filterAndDisplayWords(e.target.value);
-        });
-
+        
         // Initial display of all words
         filterAndDisplayWords();
       }
