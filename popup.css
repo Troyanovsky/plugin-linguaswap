@@ -457,3 +457,34 @@ input:checked + .toggle-slider:before {
 .import-btn:hover {
   background-color: #dcfce7;
 }
+
+/* How to Use Section */
+.how-to-use {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.how-to-use h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.how-to-use ol {
+  padding-left: 24px;
+  color: #4b5563;
+}
+
+.how-to-use li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.how-to-use li:last-child {
+  margin-bottom: 0;
+}
