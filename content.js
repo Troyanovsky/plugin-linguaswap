@@ -54,6 +54,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         el.outerHTML = el.getAttribute('title');
       });
     }
+  } else if (message.type === 'wordListUpdated') {
+    if (isSwappingEnabled) {
+      chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
+        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        if (message.langPairKey === currentLangPair) {
+          // First remove all existing translations
+          document.querySelectorAll('.linguaswap-word').forEach(el => {
+            el.outerHTML = el.getAttribute('title');
+          });
+          
+          // Then apply all translations from the updated word list
+          const currentWordList = wordLists[currentLangPair] || {};
+          Object.entries(currentWordList).forEach(([word, translation]) => {
+            replaceWords(word, translation);
+          });
+        }
+      });
+    }
   }
 });
 

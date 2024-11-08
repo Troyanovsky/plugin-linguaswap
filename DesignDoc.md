@@ -129,6 +129,7 @@ curl -X GET "https://plugin-linguaswap-backend.vercel.app/api/translate?text=Hel
 - Persistent storage of word translations list
 - Manage word translations (sort/edit/delete)
 - Unified hosted translation API for users without a translation API key (Added Nov 7, 2024)
+- Import word lists from files (Added Nov 8, 2024)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance
@@ -136,7 +137,6 @@ curl -X GET "https://plugin-linguaswap-backend.vercel.app/api/translate?text=Hel
 - Preserves text node structure
 
 ## Future Enhancements
-- Support import of word lists (e.g. TOEFL, IELTS, etc.)
 - Easier management of word lists (pagination, searching etc.)
 - Additional translation services (e.g. Google Translate, Bing Translate, etc.)
 - Add contextual translation using LLMs for word conjugations

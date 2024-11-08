@@ -447,3 +447,13 @@ input:checked + .toggle-slider:before {
   background-color: #fff;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
+
+.import-btn {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #16a34a;
+}
+
+.import-btn:hover {
+  background-color: #dcfce7;
+}
