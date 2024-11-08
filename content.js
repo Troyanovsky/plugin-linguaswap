@@ -38,13 +38,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.type === 'toggleSwap') {
     isSwappingEnabled = message.isEnabled;
     if (isSwappingEnabled) {
-      // Re-apply all translations
-      chrome.storage.local.get('wordLists', ({ wordLists }) => {
-        if (wordLists) {
-          Object.entries(wordLists).forEach(([langPairKey, currentWordList]) => {
-            Object.entries(currentWordList).forEach(([word, translation]) => {
-              replaceWords(word, translation);
-            });
+      // Re-apply translations for current language pair only
+      chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
+        if (wordLists && settings) {
+          const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+          const currentWordList = wordLists[langPairKey] || {};
+          // First remove any existing translations
+          document.querySelectorAll('.linguaswap-word').forEach(el => {
+            el.outerHTML = el.getAttribute('title');
+          });
+          // Then apply current language pair translations
+          Object.entries(currentWordList).forEach(([word, translation]) => {
+            replaceWords(word, translation);
           });
         }
       });
@@ -70,6 +75,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             replaceWords(word, translation);
           });
         }
+      });
+    }
+  } else if (message.type === 'settingsUpdated') {
+    if (isSwappingEnabled) {
+      // First remove all existing translations
+      document.querySelectorAll('.linguaswap-word').forEach(el => {
+        el.outerHTML = el.getAttribute('title');
+      });
+      
+      // Then apply translations for the new language pair
+      const langPairKey = `${message.settings.defaultLanguage}-${message.settings.targetLanguage}`;
+      chrome.storage.local.get('wordLists', ({ wordLists }) => {
+        const currentWordList = wordLists[langPairKey] || {};
+        Object.entries(currentWordList).forEach(([word, translation]) => {
+          replaceWords(word, translation);
+        });
       });
     }
   }

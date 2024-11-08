@@ -90,6 +90,152 @@ document.addEventListener('DOMContentLoaded', async () => {
     return { searchContainer, searchInput };
   }
 
+  // Function to create action buttons
+  function createActionButtons(langPairKey, currentWordList, filterAndDisplayWords, searchInput) {
+    const actionsContainer = document.createElement('div');
+    actionsContainer.className = 'list-actions';
+    
+    // Add import button
+    const importBtn = document.createElement('button');
+    importBtn.className = 'action-btn import-btn';
+    importBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Import
+    `;
+    
+    // Create hidden file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+    
+    // Handle file selection
+    fileInput.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const text = e.target.result;
+          const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+          
+          // Validate CSV format
+          const wordPairs = lines.map(line => {
+            const [word, translation] = line.split(',').map(item => item.trim());
+            if (!word || !translation) {
+              throw new Error('Invalid CSV format. Each line must have two columns separated by a comma (default language, target language).');
+            }
+            return [word.toLowerCase(), translation];
+          });
+
+          // Get current word lists
+          const { wordLists = {} } = await chrome.storage.local.get('wordLists');
+          
+          // Initialize or get current language pair's word list
+          wordLists[langPairKey] = wordLists[langPairKey] || {};
+          
+          // Add or update words
+          wordPairs.forEach(([word, translation]) => {
+            wordLists[langPairKey][word] = translation;
+          });
+
+          // Save updated word lists
+          await chrome.storage.local.set({ wordLists });
+          
+          // Update currentWordList reference
+          Object.assign(currentWordList, wordLists[langPairKey]);
+          
+          // Update display
+          filterAndDisplayWords(searchInput.value);
+          
+          // Notify all tabs to update their content
+          const tabs = await chrome.tabs.query({});
+          tabs.forEach(tab => {
+            chrome.tabs.sendMessage(tab.id, {
+              type: 'wordListUpdated',
+              langPairKey
+            }).catch(() => {
+              // Ignore errors for inactive tabs
+            });
+          });
+          
+          showNotification(`Successfully imported ${wordPairs.length} words!`);
+        } catch (error) {
+          showNotification(error.message, 'error');
+        }
+      };
+      
+      reader.readAsText(file);
+      fileInput.value = ''; // Reset file input
+    });
+    
+    importBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    // Export button
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'action-btn export-btn';
+    exportBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export
+    `;
+    
+    exportBtn.addEventListener('click', () => {
+      // Convert word list to CSV content for export
+      const csvContent = Object.entries(currentWordList)
+        .map(([word, translation]) => `${word},${translation}`)
+        .join('\n');
+      
+      // Create blob and download link
+      const blob = new Blob([`${langPairKey}\n${csvContent}`], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `linguaswap-wordlist-${langPairKey}.csv`;
+      
+      // Trigger download
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      showNotification('Word list exported successfully!');
+    });
+    
+    // Sort button
+    const sortBtn = document.createElement('button');
+    sortBtn.className = 'action-btn sort-btn';
+    let isAscending = true;
+    
+    const updateSortButtonText = () => {
+      sortBtn.innerHTML = `↕️ ${isAscending ? 'A → Z' : 'Z → A'}`;
+    };
+    updateSortButtonText();
+    
+    sortBtn.addEventListener('click', () => {
+      isAscending = !isAscending;
+      updateSortButtonText();
+      filterAndDisplayWords(searchInput.value);
+    });
+    
+    actionsContainer.appendChild(importBtn);
+    actionsContainer.appendChild(exportBtn);
+    actionsContainer.appendChild(sortBtn);
+    
+    return { actionsContainer, isAscending: () => isAscending };
+  }
+
   // Main updateWordList function
   const updateWordList = () => {
     const wordListContainer = document.getElementById('wordList');
@@ -109,6 +255,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const wordsContainer = document.createElement('div');
         wordsContainer.className = 'words-container';
         
+        let sortState;
+        
         // Function to filter and display words
         const filterAndDisplayWords = (searchTerm = '') => {
           wordsContainer.innerHTML = '';
@@ -116,7 +264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .filter(([word]) => 
               word.toLowerCase().includes(searchTerm.toLowerCase())
             )
-            .sort(([a], [b]) => isAscending ? a.localeCompare(b) : b.localeCompare(a));
+            .sort(([a], [b]) => sortState.isAscending() ? a.localeCompare(b) : b.localeCompare(a));
 
           sortedEntries.forEach(([word, translation]) => {
             addWordToList(word, translation, wordsContainer, langPairKey, currentWordList, filterAndDisplayWords, searchInput);
@@ -127,158 +275,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { searchContainer, searchInput } = createSearchContainer(filterAndDisplayWords);
         wordListContainer.appendChild(searchContainer);
 
-        // Actions container (for export and sort buttons)
-        const actionsContainer = document.createElement('div');
-        actionsContainer.className = 'list-actions';
-        
-        // Add import button
-        const importBtn = document.createElement('button');
-        importBtn.className = 'action-btn import-btn';
-        importBtn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          Import
-        `;
-        
-        // Create hidden file input
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.csv';
-        fileInput.style.display = 'none';
-        document.body.appendChild(fileInput);
-        
-        // Handle file selection
-        fileInput.addEventListener('change', async (event) => {
-          const file = event.target.files[0];
-          if (!file) return;
-          
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            try {
-              const text = e.target.result;
-              const lines = text.split('\n').map(line => line.trim()).filter(line => line);
-              
-              // Validate CSV format
-              const wordPairs = lines.map(line => {
-                const [word, translation] = line.split(',').map(item => item.trim());
-                if (!word || !translation) {
-                  throw new Error('Invalid CSV format. Each line must have two columns separated by a comma (default language, target language).');
-                }
-                return [word.toLowerCase(), translation];
-              });
-
-              // Get current word lists
-              const { wordLists = {} } = await chrome.storage.local.get('wordLists');
-              const langPairKey = `${currentSettings.defaultLanguage}-${currentSettings.targetLanguage}`;
-              
-              // Initialize or get current language pair's word list
-              wordLists[langPairKey] = wordLists[langPairKey] || {};
-              
-              // Add or update words
-              wordPairs.forEach(([word, translation]) => {
-                wordLists[langPairKey][word] = translation;
-              });
-
-              // Save updated word lists
-              await chrome.storage.local.set({ wordLists });
-              
-              // Update display
-              updateWordList();
-              
-              // Notify all tabs to update their content
-              const tabs = await chrome.tabs.query({});
-              tabs.forEach(tab => {
-                chrome.tabs.sendMessage(tab.id, {
-                  type: 'wordListUpdated',
-                  langPairKey
-                }).catch(() => {
-                  // Ignore errors for inactive tabs
-                });
-              });
-              
-              showNotification(`Successfully imported ${wordPairs.length} words!`);
-            } catch (error) {
-              showNotification(error.message, 'error');
-            }
-          };
-          
-          reader.readAsText(file);
-          fileInput.value = ''; // Reset file input
-        });
-        
-        importBtn.addEventListener('click', () => {
-          fileInput.click();
-        });
-        
-        // Export button
-        const exportBtn = document.createElement('button');
-        exportBtn.className = 'action-btn export-btn';
-        exportBtn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Export
-        `;
-        
-        exportBtn.addEventListener('click', () => {
-          // Convert word list to CSV content for export
-          const csvContent = Object.entries(currentWordList)
-            .map(([word, translation]) => `${word},${translation}`)
-            .join('\n');
-          
-          // Create blob and download link
-          const blob = new Blob([`${langPairKey}\n${csvContent}`], { type: 'text/csv' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `linguaswap-wordlist-${langPairKey}.csv`;
-          
-          // Trigger download
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-          
-          showNotification('Word list exported successfully!');
-        });
-        
-        // Sort button
-        const sortBtn = document.createElement('button');
-        sortBtn.className = 'action-btn sort-btn';
-        sortBtn.innerHTML = `
-        ↕️ A → Z
-        `;
-        
-        let isAscending = true;
-        sortBtn.addEventListener('click', () => {
-          isAscending = !isAscending;
-          sortBtn.innerHTML = `
-            ↕️ ${isAscending ? 'A → Z' : 'Z → A'}
-          `;
-          
-          // Sort and update the word list
-          const wordsContainer = wordListContainer.querySelector('.words-container');
-          if (wordsContainer) {
-            wordsContainer.innerHTML = '';
-            
-            const sortedEntries = Object.entries(currentWordList).sort(([a], [b]) => {
-              return isAscending ? a.localeCompare(b) : b.localeCompare(a);
-            });
-            
-            sortedEntries.forEach(([word, translation]) => {
-              addWordToList(word, translation, wordsContainer, langPairKey, currentWordList, filterAndDisplayWords, searchInput);
-            });
-          }
-        });
-        
-        actionsContainer.appendChild(importBtn);
-        actionsContainer.appendChild(exportBtn);
-        actionsContainer.appendChild(sortBtn);
+        // Add action buttons
+        const { actionsContainer, isAscending } = createActionButtons(
+          langPairKey, 
+          currentWordList, 
+          filterAndDisplayWords,
+          searchInput
+        );
+        sortState = { isAscending };
         wordListContainer.appendChild(actionsContainer);
         
         wordListContainer.appendChild(wordsContainer);
@@ -314,6 +318,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Update word list display for new language pair
       updateWordList();
+      
+      // Notify all tabs to update their content with new language pair
+      const tabs = await chrome.tabs.query({});
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          type: 'settingsUpdated',
+          settings: newSettings
+        }).catch(() => {
+          // Ignore errors for inactive tabs
+        });
+      });
       
       showNotification('Settings saved successfully!');
     });
