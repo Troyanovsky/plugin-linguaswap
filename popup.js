@@ -56,7 +56,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (defaultLanguageSelect) defaultLanguageSelect.value = currentSettings.defaultLanguage;
   if (targetLanguageSelect) targetLanguageSelect.value = currentSettings.targetLanguage;
 
-  // Function to update word list display
+  // Function to create empty state element
+  function createEmptyState() {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state';
+    emptyState.innerHTML = `
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+        <rect x="9" y="3" width="6" height="4" rx="2" />
+      </svg>
+      <p>No words added yet</p>
+      <small>Words you add will appear here</small>
+    `;
+    return emptyState;
+  }
+
+  // Main updateWordList function
   const updateWordList = () => {
     const wordListContainer = document.getElementById('wordList');
     if (wordListContainer) {
@@ -65,21 +80,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Get current language pair's word list
       const langPairKey = `${currentSettings.defaultLanguage}-${currentSettings.targetLanguage}`;
-      let currentWordList = wordLists[langPairKey] || {};
+      const currentWordList = wordLists[langPairKey] || {};
       
-      // Check if the word list is empty, and if so, display an empty state
+      // Check if the word list is empty
       if (Object.keys(currentWordList).length === 0) {
-        const emptyState = document.createElement('div');
-        emptyState.className = 'empty-state';
-        emptyState.innerHTML = `
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
-            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-            <rect x="9" y="3" width="6" height="4" rx="2" />
-          </svg>
-          <p>No words added yet</p>
-          <small>Words you add will appear here</small>
-        `;
-        wordListContainer.appendChild(emptyState);
+        wordListContainer.appendChild(createEmptyState());
       } else {
         // Add search container
         const searchContainer = document.createElement('div');
