@@ -73,11 +73,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Add this after populating language selects
   const providerBtns = document.querySelectorAll('.provider-btn');
+  // First remove any existing active classes
+  providerBtns.forEach(btn => btn.classList.remove('active'));
+  // Then set the active class based on current settings
   providerBtns.forEach(btn => {
     if (btn.dataset.provider === currentSettings.provider) {
       btn.classList.add('active');
     }
-    
+  });
+
+  // Update click handler
+  providerBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       providerBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
