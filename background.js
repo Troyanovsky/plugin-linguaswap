@@ -106,7 +106,7 @@ async function translateWord(text, sourceLang, targetLang) {
   // Get current settings to access the provider
   const { settings = { provider: 'deepl' } } = await chrome.storage.local.get('settings');
   
-  const baseUrl = 'https://plugin-linguaswap-backend.vercel.app/api/translate';
+  const baseUrl = 'https://linguaswap.524619251.xyz/api/translate';
   const params = new URLSearchParams({
     text,
     target_lang: targetLang,

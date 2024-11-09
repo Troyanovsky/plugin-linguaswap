@@ -93,7 +93,7 @@ Key Features:
 ## API Implementation
 
 **Endpoint**:  
-`GET https://plugin-linguaswap-backend.vercel.app/api/translate`
+`GET https://linguaswap.524619251.xyz/api/translate`
 
 ### Query Parameters
 - **text** (string, required): Text to translate (max 30 characters).
@@ -118,7 +118,7 @@ Key Features:
 
 ### Example Request
 ```bash
-curl -X GET "https://plugin-linguaswap-backend.vercel.app/api/translate?text=Hello&target_lang=DE"
+curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_lang=DE"
 ```
 
 ## Current Considerations
@@ -129,7 +129,7 @@ curl -X GET "https://plugin-linguaswap-backend.vercel.app/api/translate?text=Hel
 - Persistent storage of word translations list
 - Manage word translations (sort/edit/delete)
 - Unified hosted translation API for users without a translation API key (Added Nov 7, 2024)
-- Import word lists from files (Added Nov 8, 2024)
+- Import word lists from CSV (Added Nov 8, 2024)
 - Multiple translation providers (DeepL, LLMs through OpenRouter) (Added Nov 9, 2024)
 
 ### Technical Implementation
