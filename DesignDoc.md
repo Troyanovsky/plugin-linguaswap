@@ -96,10 +96,12 @@ Key Features:
 `GET https://linguaswap.524619251.xyz/api/translate`
 
 ### Query Parameters
-- **text** (string, required): Text to translate (max 30 characters).
-- **source_lang** (string, optional): Source language code (e.g., `EN`). Defaults to auto-detect.
-- **target_lang** (string, required): Target language code (e.g., `DE`).
-- **provider** (string, optional, default: `deepl`): Translation provider. Only `deepl` is supported as of now.
+- **text** (string, required): The text to translate. Must be 30 characters or fewer.
+- **source_lang** (string, optional): The source language code (e.g., `EN` for English). If omitted, translation provider auto-detects.
+- **target_lang** (string, required): The target language code (e.g., `DE` for German).
+- **provider** (string, optional): The translation provider. If omitted, defaults to `deepl`.
+- **context** (string, optional): Additional context for translation (optional, not yet implemented).
+- **caller** (string, optional): The caller ID (optional).
 
 ### Responses
 - **200 OK**

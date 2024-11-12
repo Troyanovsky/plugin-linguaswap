@@ -1,5 +1,5 @@
 // Debug mode flag
-const debug_mode = false;
+const debug_mode = true;
 
 // Debug logger
 const debug = (message, data = null) => {
@@ -99,18 +99,43 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+// Function to generate a URL-safe random hash ID
+function generateHashId() {
+  // Generate 16 random bytes
+  const buffer = crypto.getRandomValues(new Uint8Array(16));
+  
+  // Convert to Base64
+  const base64 = btoa(String.fromCharCode.apply(null, buffer));
+  
+  // Make Base64 URL-safe
+  const urlSafeHash = base64
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+    
+  return urlSafeHash;
+}
+
 // Function to translate a word using the LinguaSwap API
 async function translateWord(text, sourceLang, targetLang) {
   debug('translateWord called with:', { text, sourceLang, targetLang });
   
-  // Get current settings to access the provider
-  const { settings = { provider: 'deepl' } } = await chrome.storage.local.get('settings');
+  // Get settings and caller ID
+  const { settings, callerId } = await chrome.storage.local.get(['settings', 'callerId']);
+  let currentCallerId = callerId;
+  
+  if (!currentCallerId) {
+    currentCallerId = generateHashId();
+    await chrome.storage.local.set({ callerId: currentCallerId });
+    debug('Generated new caller ID:', currentCallerId);
+  }
   
   const baseUrl = 'https://linguaswap.524619251.xyz/api/translate';
   const params = new URLSearchParams({
     text,
     target_lang: targetLang,
-    provider: settings.provider
+    provider: settings.provider,
+    caller: currentCallerId
   });
   
   // Only add source_lang if it's provided (otherwise let API auto-detect)
