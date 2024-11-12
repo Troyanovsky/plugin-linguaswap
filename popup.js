@@ -312,9 +312,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Function to filter and display words
         const filterAndDisplayWords = (searchTerm = '') => {
           wordsContainer.innerHTML = '';
+          const searchTermLower = searchTerm.toLowerCase();
           const sortedEntries = Object.entries(currentWordList)
-            .filter(([word]) => 
-              word.toLowerCase().includes(searchTerm.toLowerCase())
+            .filter(([word, translation]) => 
+              word.toLowerCase().includes(searchTermLower) || 
+              translation.toLowerCase().includes(searchTermLower)
             )
             .sort(([a], [b]) => sortState.isAscending() ? a.localeCompare(b) : b.localeCompare(a));
 
