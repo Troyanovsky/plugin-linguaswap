@@ -140,6 +140,8 @@ curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_la
 - Preserves text node structure
 
 ## Future Enhancements
+- Download pre-made word lists (Backend done, client to be done)
+- Show original word on hover
 - Easier management of word lists (pagination etc.)
 - Word frequency statistics
 - Multilingual UI

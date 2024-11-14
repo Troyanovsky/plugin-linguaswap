@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let isAscending = true;
     
     const updateSortButtonText = () => {
-      sortBtn.innerHTML = `↕️ ${isAscending ? 'A → Z' : 'Z → A'}`;
+      sortBtn.innerHTML = `↕️ ${isAscending ? 'A→Z' : 'Z→A'}`;
     };
     updateSortButtonText();
     
