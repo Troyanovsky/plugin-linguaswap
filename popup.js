@@ -13,6 +13,50 @@ const debug = (message, data = null) => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize i18n for static elements
+  const elementsToLocalize = {
+    'appTitle': 'appTitle',
+    'wordlistLabel': 'wordlistLabel',
+    'settingsLabel': 'settingsLabel',
+    'howToUseTitle': 'howToUseTitle',
+    'step1': 'step1',
+    'step2': 'step2',
+    'step3': 'step3',
+    'defaultLanguageLabel': 'defaultLanguageLabel',
+    'targetLanguageLabel': 'targetLanguageLabel',
+    'providerLabel': 'providerLabel',
+    'llmProviderBtn': 'llmProviderBtn',
+    'deeplProviderBtn': 'deeplProviderBtn',
+    'saveSettings': 'saveSettings',
+    'buyMeCoffeeText': 'buyMeCoffeeText',
+    'githubLinkText': 'githubLinkText',
+    'feedbackLinkText': 'feedbackLinkText'
+  };
+
+  Object.entries(elementsToLocalize).forEach(([id, messageName]) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = chrome.i18n.getMessage(messageName);
+    }
+  });
+
+  // Update language options
+  const languageOptions = {
+    'defaultLangZH': 'defaultLangZH',
+    'defaultLangEN': 'defaultLangEN',
+    'targetLangEN': 'targetLangEN',
+    'targetLangDE': 'targetLangDE',
+    'targetLangFR': 'targetLangFR',
+    'targetLangES': 'targetLangES'
+  };
+
+  Object.entries(languageOptions).forEach(([id, messageName]) => {
+    const option = document.getElementById(id);
+    if (option) {
+      option.textContent = chrome.i18n.getMessage(messageName);
+    }
+  });
+
   // Toggle translation button
   const swapToggle = document.getElementById('swapToggle');
   
@@ -95,12 +139,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const emptyState = document.createElement('div');
     emptyState.className = 'empty-state';
     emptyState.innerHTML = `
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+      <svg id="emptyStateIcon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
         <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
         <rect x="9" y="3" width="6" height="4" rx="2" />
       </svg>
-      <p>No words added yet</p>
-      <small>Words you add will appear here</small>
+      <p id="emptyStateTitle">${chrome.i18n.getMessage('emptyStateTitle')}</p>
+      <small id="emptyStateSubtitle">${chrome.i18n.getMessage('emptyStateSubtitle')}</small>
     `;
     return emptyState;
   }
@@ -111,9 +155,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchContainer.className = 'search-container';
     
     const searchInput = document.createElement('input');
+    searchInput.id = 'wordSearchInput';
     searchInput.type = 'text';
     searchInput.className = 'search-input';
-    searchInput.placeholder = 'Search words...';
+    searchInput.placeholder = chrome.i18n.getMessage('wordSearchInput');
     
     // Add search input listener
     searchInput.addEventListener('input', (e) => {
@@ -127,18 +172,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Function to create import button
   function createImportButton(langPairKey, currentWordList, filterAndDisplayWords, searchInput) {
     const importBtn = document.createElement('button');
+    importBtn.id = 'importWordsBtn';
     importBtn.className = 'action-btn import-btn';
     importBtn.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg id="importBtnIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="17 8 12 3 7 8"/>
         <line x1="12" y1="3" x2="12" y2="15"/>
       </svg>
-      Import
+      <span id="importBtnText">${chrome.i18n.getMessage('importBtnText')}</span>
     `;
     
     // Create hidden file input
     const fileInput = document.createElement('input');
+    fileInput.id = 'importFileInput';
     fileInput.type = 'file';
     fileInput.accept = '.csv';
     fileInput.style.display = 'none';
@@ -150,6 +197,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!file) return;
       
       const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      
       reader.onload = async (e) => {
         try {
           const text = e.target.result;
@@ -201,7 +250,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       };
       
-      reader.readAsText(file);
       fileInput.value = ''; // Reset file input
     });
     
@@ -215,14 +263,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Function to create export button
   function createExportButton(langPairKey, currentWordList) {
     const exportBtn = document.createElement('button');
+    exportBtn.id = 'exportWordsBtn';
     exportBtn.className = 'action-btn export-btn';
     exportBtn.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg id="exportBtnIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      Export
+      <span id="exportBtnText">${chrome.i18n.getMessage('exportBtnText')}</span>
     `;
     
     exportBtn.addEventListener('click', () => {
@@ -253,6 +302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Function to create sort button
   function createSortButton(filterAndDisplayWords, searchInput) {
     const sortBtn = document.createElement('button');
+    sortBtn.id = 'sortWordsBtn';
     sortBtn.className = 'action-btn sort-btn';
     let isAscending = true;
     

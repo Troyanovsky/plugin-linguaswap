@@ -133,6 +133,7 @@ curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_la
 - Unified hosted translation API for users without a translation API key (Added Nov 7, 2024)
 - Import word lists from CSV (Added Nov 8, 2024)
 - Multiple translation providers (DeepL, LLMs through OpenRouter) (Added Nov 9, 2024)
+- UI localization for Chinese (Added Nov 16, 2024)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance

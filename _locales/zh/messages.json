@@ -1,0 +1,83 @@
+{
+    "appTitle": {
+      "message": "LinguaSwap"
+    },
+    "wordlistLabel": {
+      "message": "单词列表"
+    },
+    "settingsLabel": {
+      "message": "设置"
+    },
+    "howToUseTitle": {
+      "message": "使用说明"
+    },
+    "step1": {
+      "message": "在下方选择默认语言和目标语言"
+    },
+    "step2": {
+      "message": "在任何网页上，选中单词，右键点击并选择[添加到 LinguaSwap]"
+    },
+    "step3": {
+      "message": "当你重新访问页面时，默认语言中的单词将自动显示其翻译"
+    },
+    "defaultLanguageLabel": {
+      "message": "默认语言"
+    },
+    "targetLanguageLabel": {
+      "message": "目标语言"
+    },
+    "providerLabel": {
+      "message": "翻译提供商"
+    },
+    "llmProviderBtn": {
+      "message": "大语言模型"
+    },
+    "deeplProviderBtn": {
+      "message": "DeepL"
+    },
+    "saveSettings": {
+      "message": "保存设置"
+    },
+    "buyMeCoffeeText": {
+      "message": "请我喝咖啡"
+    },
+    "githubLinkText": {
+      "message": "在GitHub上查看"
+    },
+    "feedbackLinkText": {
+      "message": "提供反馈"
+    },
+    "defaultLangZH": {
+      "message": "中文"
+    },
+    "defaultLangEN": {
+      "message": "英语"
+    },
+    "targetLangEN": {
+      "message": "英语"
+    },
+    "targetLangDE": {
+      "message": "德语"
+    },
+    "targetLangFR": {
+      "message": "法语"
+    },
+    "targetLangES": {
+      "message": "西班牙语"
+    },
+    "emptyStateTitle": {
+      "message": "还没有添加单词"
+    },
+    "emptyStateSubtitle": {
+      "message": "添加的单词将显示在这里"
+    },
+    "wordSearchInput": {
+      "message": "搜索单词..."
+    },
+    "importBtnText": {
+      "message": "导入"
+    },
+    "exportBtnText": {
+      "message": "导出"
+    }
+  }
