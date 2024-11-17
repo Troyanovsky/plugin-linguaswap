@@ -48,10 +48,16 @@ Key Functions:
 Key Features:
 - Tab-based interface (Settings/Word List)
 - Language pair selection
-- DeepL API key management
+- Translation provider selection (DeepL/LLM)
 - Word list management
+  - Search functionality
+  - Import/Export CSV
+  - Sort words (A→Z, Z→A)
+  - Edit/Delete words
 - Enable/disable toggle
-- GitHub and Buy Me a Coffee links
+- Notification system
+- Internationalization (i18n) support
+- Debug mode for troubleshooting
 
 ## Data Structure
 
@@ -61,7 +67,7 @@ Key Features:
   settings: {
     defaultLanguage: string,
     targetLanguage: string,
-    deeplApiKey: string
+    provider: string      // 'deepl' or 'openrouter'
   },
   wordLists: {
     "LANG1-LANG2": {
@@ -85,6 +91,20 @@ Key Features:
    ```
    Page Load → Get Settings/Words → Process Text Nodes → 
    Replace Words → Apply Inherited Styling
+   ```
+
+3. **Word List Management**:
+   ```
+   Import CSV → Validate Format → Update Storage → 
+   Refresh Display → Notify Tabs
+   
+   Export CSV → Generate Content → Download File
+   
+   Edit Word → Update Storage → Refresh Display → 
+   Notify Tabs
+   
+   Delete Word → Update Storage → Refresh Display → 
+   Notify Tabs
    ```
 
 ## Styling Implementation
