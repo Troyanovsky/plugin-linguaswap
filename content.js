@@ -33,7 +33,11 @@ function removeAllTranslations(wordFilter = null) {
 
 // Apply translations for a language pair
 function applyTranslations(wordList) {
-  Object.entries(wordList).forEach(([word, translation]) => {
+  // Sort entries by word length (longest first)
+  const sortedEntries = Object.entries(wordList)
+    .sort(([wordA], [wordB]) => wordB.length - wordA.length);
+  
+  sortedEntries.forEach(([word, translation]) => {
     replaceWords(word, translation);
   });
 }
@@ -145,9 +149,7 @@ chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = 
   if (isSwappingEnabled && settings && !isExcludedSite(settings.excludedSites)) {
     const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
     const currentWordList = wordLists[langPairKey] || {};
-    Object.entries(currentWordList).forEach(([word, translation]) => {
-      replaceWords(word, translation);
-    });
+    applyTranslations(currentWordList);
   }
 });
 
