@@ -12,6 +12,25 @@ const debug = (message, data = null) => {
   }
 };
 
+const getFromStorage = async (keys) => {
+  const result = await chrome.storage.local.get(keys);
+  debug('Storage get:', result);
+  return result;
+};
+
+const setToStorage = async (data) => {
+  await chrome.storage.local.set(data);
+  debug('Storage set:', data);
+};
+
+const updateWordList = async (langPairKey, updates) => {
+  const { wordLists = {} } = await getFromStorage('wordLists');
+  wordLists[langPairKey] = wordLists[langPairKey] || {};
+  Object.assign(wordLists[langPairKey], updates);
+  await setToStorage({ wordLists });
+  return wordLists[langPairKey];
+};
+
 const sendMessageToAllTabs = async (message) => {
   const tabs = await chrome.tabs.query({});
   const messagePromises = tabs.map(tab => 
@@ -75,13 +94,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const swapToggle = document.getElementById('swapToggle');
   
   // Load toggle state
-  const { isEnabled = true } = await chrome.storage.local.get('isEnabled');
+  const { isEnabled = true } = await getFromStorage('isEnabled');
   swapToggle.checked = isEnabled;
 
   // Handle toggle changes
   swapToggle.addEventListener('change', async () => {
     const isEnabled = swapToggle.checked;
-    await chrome.storage.local.set({ isEnabled });
+    await setToStorage({ isEnabled });
     
     // Notify content script of the change
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -110,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Load settings and word lists
-  const { settings = {}, wordLists = {} } = await chrome.storage.local.get(['settings', 'wordLists']);
+  const { settings = {}, wordLists = {} } = await getFromStorage(['settings', 'wordLists']);
   
   // Initialize default settings if they don't exist
   const defaultSettings = {
@@ -230,22 +249,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             return [word.toLowerCase(), translation];
           });
 
-          // Get current word lists
-          const { wordLists = {} } = await chrome.storage.local.get('wordLists');
-          
-          // Initialize or get current language pair's word list
-          wordLists[langPairKey] = wordLists[langPairKey] || {};
-          
-          // Add or update words
-          wordPairs.forEach(([word, translation]) => {
-            wordLists[langPairKey][word] = translation;
-          });
-
-          // Save updated word lists
-          await chrome.storage.local.set({ wordLists });
+          // Convert array to object for storage
+          const updates = Object.fromEntries(wordPairs);
+          const updatedList = await updateWordList(langPairKey, updates);
           
           // Update currentWordList reference
-          Object.assign(currentWordList, wordLists[langPairKey]);
+          Object.assign(currentWordList, updatedList);
           
           // Update display
           filterAndDisplayWords(searchInput.value);
@@ -434,11 +443,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         excludedSites
       };
 
-      // Get old settings to compare excluded sites
-      const { settings: oldSettings = {} } = await chrome.storage.local.get('settings');
+      const { settings: oldSettings = {} } = await getFromStorage('settings');
       const oldExcludedSites = oldSettings.excludedSites || [];
 
-      await chrome.storage.local.set({ settings: newSettings });
+      await setToStorage({ settings: newSettings });
       
       // Update currentSettings before updating word list
       Object.assign(currentSettings, newSettings);
@@ -509,13 +517,12 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
     saveBtn.addEventListener('click', async () => {
       const newTranslation = inputField.value.trim();
       if (newTranslation) {
-        const { wordLists } = await chrome.storage.local.get('wordLists');
-        wordLists[langPairKey][word] = newTranslation;
-        await chrome.storage.local.set({ wordLists });
-
+        const updates = { [word]: newTranslation };
+        const updatedList = await updateWordList(langPairKey, updates);
+        
         // Update the current word list
-        currentWordList[word] = newTranslation;
-
+        Object.assign(currentWordList, updatedList);
+        
         // Refresh the filtered display
         filterAndDisplayWords(searchInput.value);
 
@@ -541,9 +548,9 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
 
   // Delete button
   deleteBtn.addEventListener('click', async () => {
-    const { wordLists } = await chrome.storage.local.get('wordLists');
+    const { wordLists } = await getFromStorage('wordLists');
     delete wordLists[langPairKey][word];
-    await chrome.storage.local.set({ wordLists });
+    await setToStorage({ wordLists });
     
     // Update the current word list
     delete currentWordList[word];
