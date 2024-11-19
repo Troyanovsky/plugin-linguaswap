@@ -12,6 +12,18 @@ const debug = (message, data = null) => {
   }
 };
 
+const sendMessageToAllTabs = async (message) => {
+  const tabs = await chrome.tabs.query({});
+  const messagePromises = tabs.map(tab => 
+    chrome.tabs.sendMessage(tab.id, message).catch(() => {
+      // Ignore errors for inactive tabs
+      debug('Error sending message to tab:', tab.id);
+    })
+  );
+  await Promise.all(messagePromises);
+  debug('Messages sent to all tabs:', message);
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize i18n for static elements
   const elementsToLocalize = {
@@ -238,15 +250,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           // Update display
           filterAndDisplayWords(searchInput.value);
           
-          // Notify all tabs to update their content
-          const tabs = await chrome.tabs.query({});
-          tabs.forEach(tab => {
-            chrome.tabs.sendMessage(tab.id, {
-              type: 'wordListUpdated',
-              langPairKey
-            }).catch(() => {
-              // Ignore errors for inactive tabs
-            });
+          // Replace tab message sending with:
+          await sendMessageToAllTabs({
+            type: 'wordListUpdated',
+            langPairKey
           });
           
           showNotification(`Successfully imported ${wordPairs.length} words!`);
@@ -439,17 +446,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update word list display for new language pair
       updateWordList();
       
-      // Notify all tabs to update their content with new settings
-      const tabs = await chrome.tabs.query({});
-      tabs.forEach(tab => {
-        chrome.tabs.sendMessage(tab.id, {
-          type: 'settingsUpdated',
-          settings: newSettings,
-          oldExcludedSites,
-          newExcludedSites: excludedSites
-        }).catch(() => {
-          // Ignore errors for inactive tabs
-        });
+      // Replace tab message sending with:
+      await sendMessageToAllTabs({
+        type: 'settingsUpdated',
+        settings: newSettings,
+        oldExcludedSites,
+        newExcludedSites: excludedSites
       });
       
       showNotification('Settings saved successfully!');
@@ -489,7 +491,7 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
   deleteBtn.title = "Delete word";
 
   // Edit button
-  editBtn.addEventListener('click', () => {
+  editBtn.addEventListener('click', async () => {
     // Replace text with input field
     const inputField = document.createElement('input');
     inputField.className = 'word-edit-input';
@@ -521,25 +523,14 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
         wordText.textContent = `${word} : ${newTranslation}`;
         actionsDiv.replaceChild(editBtn, saveBtn);
 
-        // Notify all tabs to update their content
-        const tabs = await chrome.tabs.query({});
-        debug('Found tabs:', tabs.length);
-
-        const messagePromises = tabs.map(tab => 
-          chrome.tabs.sendMessage(tab.id, {
-            type: 'wordEdited',
-            word,
-            translation: newTranslation,
-            langPairKey
-          }).catch(error => {
-            debug('Error sending message to tab:', tab.id, error);
-            return null;
-          })
-        );
-
-        await Promise.all(messagePromises);
-        debug('Messages sent to all tabs');
-
+        // Replace tab message sending with:
+        await sendMessageToAllTabs({
+          type: 'wordEdited',
+          word,
+          translation: newTranslation,
+          langPairKey
+        });
+        
         showNotification('Translation updated successfully!');
       }
     });
@@ -562,18 +553,13 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
 
     wordItem.remove();
 
-    // Notify all tabs to update the page
-    const tabs = await chrome.tabs.query({});
-    tabs.forEach(tab => {
-      chrome.tabs.sendMessage(tab.id, {
-        type: 'wordDeleted',
-        word,
-        langPairKey
-      }).catch(() => {
-        // Ignore errors for inactive tabs
-      });
+    // Replace tab message sending with:
+    await sendMessageToAllTabs({
+      type: 'wordDeleted',
+      word,
+      langPairKey
     });
-
+    
     showNotification('Word deleted successfully!');
   });
 
