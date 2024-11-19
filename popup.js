@@ -102,8 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const defaultSettings = {
     defaultLanguage: 'EN',
     targetLanguage: 'DE',
-    provider: 'deepl',
-    excludedSites: []
+    provider: 'deepl'
   };
 
   // Merge existing settings with defaults
@@ -134,11 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.classList.add('active');
     });
   });
-
-  const excludedSitesTextarea = document.getElementById('excludedSites');
-  if (excludedSitesTextarea) {
-    excludedSitesTextarea.value = currentSettings.excludedSites?.join('\n') || '';
-  }
 
   // Function to create empty state element
   function createEmptyState() {
@@ -410,10 +404,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const defaultLang = defaultLanguageSelect.value;
       const targetLang = targetLanguageSelect.value;
       const provider = document.querySelector('.provider-btn.active').dataset.provider;
-      const excludedSites = excludedSitesTextarea.value
-        .split('\n')
-        .map(url => url.trim())
-        .filter(url => url); // Remove empty lines
 
       // Check if languages are the same, only possible if both are English
       if (defaultLang === 'EN' && targetLang === 'EN-US') {
@@ -424,8 +414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const newSettings = {
         defaultLanguage: defaultLang,
         targetLanguage: targetLang,
-        provider,
-        excludedSites
+        provider
       };
 
       await chrome.storage.local.set({ settings: newSettings });

@@ -31,7 +31,6 @@ LinguaSwap is a Chrome extension designed to make language learning an integral 
 - 1.0.0: Initial release. Users need their own DeepL API key.
 - 1.0.1: Added hosted backend, removed need for DeepL API key. Search/sort/export word list.
 - 1.1.0: Added support for multiple translation providers (DeepL, LLMs through OpenRouter).
-- 1.2.0: Added support for importing word lists from CSV, and excluding specific sites from translation.
 
 ## License
 
