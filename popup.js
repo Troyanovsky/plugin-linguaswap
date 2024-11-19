@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     'saveSettings': 'saveSettings',
     'buyMeCoffeeText': 'buyMeCoffeeText',
     'githubLinkText': 'githubLinkText',
-    'feedbackLinkText': 'feedbackLinkText'
+    'feedbackLinkText': 'feedbackLinkText',
+    'excludedSitesLabel': 'excludedSitesLabel',
+    'excludedSitesHelp': 'excludedSitesHelp'
   };
 
   Object.entries(elementsToLocalize).forEach(([id, messageName]) => {
@@ -102,7 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const defaultSettings = {
     defaultLanguage: 'EN',
     targetLanguage: 'DE',
-    provider: 'deepl'
+    provider: 'deepl',
+    excludedSites: []
   };
 
   // Merge existing settings with defaults
@@ -111,9 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Populate settings
   const defaultLanguageSelect = document.getElementById('defaultLanguage');
   const targetLanguageSelect = document.getElementById('targetLanguage');
+  const excludedSitesTextarea = document.getElementById('excludedSites');
 
   if (defaultLanguageSelect) defaultLanguageSelect.value = currentSettings.defaultLanguage;
   if (targetLanguageSelect) targetLanguageSelect.value = currentSettings.targetLanguage;
+  if (excludedSitesTextarea) excludedSitesTextarea.value = currentSettings.excludedSites.join('\n');
 
   // Add this after populating language selects
   const providerBtns = document.querySelectorAll('.provider-btn');
@@ -404,6 +409,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const defaultLang = defaultLanguageSelect.value;
       const targetLang = targetLanguageSelect.value;
       const provider = document.querySelector('.provider-btn.active').dataset.provider;
+      const excludedSites = excludedSitesTextarea.value
+        .split('\n')
+        .map(site => site.trim())
+        .filter(site => site); // Remove empty lines
 
       // Check if languages are the same, only possible if both are English
       if (defaultLang === 'EN' && targetLang === 'EN-US') {
@@ -414,8 +423,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const newSettings = {
         defaultLanguage: defaultLang,
         targetLanguage: targetLang,
-        provider
+        provider,
+        excludedSites
       };
+
+      // Get old settings to compare excluded sites
+      const { settings: oldSettings = {} } = await chrome.storage.local.get('settings');
+      const oldExcludedSites = oldSettings.excludedSites || [];
 
       await chrome.storage.local.set({ settings: newSettings });
       
@@ -425,12 +439,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update word list display for new language pair
       updateWordList();
       
-      // Notify all tabs to update their content with new language pair
+      // Notify all tabs to update their content with new settings
       const tabs = await chrome.tabs.query({});
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
           type: 'settingsUpdated',
-          settings: newSettings
+          settings: newSettings,
+          oldExcludedSites,
+          newExcludedSites: excludedSites
         }).catch(() => {
           // Ignore errors for inactive tabs
         });

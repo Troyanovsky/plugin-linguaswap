@@ -67,7 +67,8 @@ Key Features:
   settings: {
     defaultLanguage: string,
     targetLanguage: string,
-    provider: string      // 'deepl' or 'openrouter'
+    provider: string,     // 'deepl' or 'openrouter'
+    excludedSites: string[]  // Added in v1.2.0
   },
   wordLists: {
     "LANG1-LANG2": {
@@ -154,6 +155,7 @@ curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_la
 - Import word lists from CSV (Added Nov 8, 2024)
 - Multiple translation providers (DeepL, LLMs through OpenRouter) (Added Nov 9, 2024)
 - UI localization for Chinese (Added Nov 16, 2024)
+- Site exclusion functionality (Added Nov 17, 2024)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance

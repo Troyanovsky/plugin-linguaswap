@@ -15,98 +15,45 @@ const debug = (message, data = null) => {
 // Global flag to track if swapping is enabled
 let isSwappingEnabled = true;
 
+// Add this function near the top
+function isExcludedSite(excludedSites) {
+  const currentUrl = window.location.hostname + window.location.pathname;
+  return excludedSites.some(site => 
+    currentUrl.toLowerCase().includes(site.toLowerCase())
+  );
+}
+
+function removeAllTranslations(wordFilter = null) {
+  document.querySelectorAll('.linguaswap-word').forEach(el => {
+    if (!wordFilter || el.getAttribute('title').toLowerCase() === wordFilter.toLowerCase()) {
+      el.outerHTML = el.getAttribute('title');
+    }
+  });
+}
+
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   debug('Content script received message:', message);
   
-  if (message.type === 'wordAdded' || message.type === 'wordEdited') {
-    debug('Processing word edit/add:', message);
-    if (isSwappingEnabled) {
-      chrome.storage.local.get('settings', ({ settings }) => {
-        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-        debug('Current language pair:', currentLangPair, 'Message pair:', message.langPairKey);
-        
-        if (message.langPairKey === currentLangPair) {
-          // First remove all instances of the old translation
-          document.querySelectorAll('.linguaswap-word').forEach(el => {
-            if (el.getAttribute('title').toLowerCase() === message.word.toLowerCase()) {
-              el.outerHTML = el.getAttribute('title');
-            }
-          });
-          // Then apply the new translation
-          replaceWords(message.word, message.translation);
-          debug('Translation updated on page');
-        }
-      });
+  if (message.type === 'settingsUpdated') {
+    const currentUrl = window.location.hostname + window.location.pathname;
+    const wasExcluded = message.oldExcludedSites.some(site => 
+      currentUrl.toLowerCase().includes(site.toLowerCase())
+    );
+    const isNowExcluded = message.newExcludedSites.some(site => 
+      currentUrl.toLowerCase().includes(site.toLowerCase())
+    );
+
+    // If site was not excluded but is now excluded, remove all translations
+    if (!wasExcluded && isNowExcluded) {
+      removeAllTranslations();
+      return;
     }
-  } else if (message.type === 'wordDeleted') {
-    if (isSwappingEnabled) {
-      chrome.storage.local.get('settings', ({ settings }) => {
-        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-        if (message.langPairKey === currentLangPair) {
-          // Restore original text for deleted word
-          document.querySelectorAll('.linguaswap-word').forEach(el => {
-            if (el.getAttribute('title').toLowerCase() === message.word.toLowerCase()) {
-              el.outerHTML = el.getAttribute('title');
-            }
-          });
-        }
-      });
-    }
-  } else if (message.type === 'showNotification') {
-    showNotification(message.message);
-  } else if (message.type === 'toggleSwap') {
-    isSwappingEnabled = message.isEnabled;
-    if (isSwappingEnabled) {
-      // Re-apply translations for current language pair only
+
+    // If site was excluded but is now not excluded, apply translations
+    if (wasExcluded && !isNowExcluded) {
       chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
-        if (wordLists && settings) {
-          const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-          const currentWordList = wordLists[langPairKey] || {};
-          // First remove any existing translations
-          document.querySelectorAll('.linguaswap-word').forEach(el => {
-            el.outerHTML = el.getAttribute('title');
-          });
-          // Then apply current language pair translations
-          Object.entries(currentWordList).forEach(([word, translation]) => {
-            replaceWords(word, translation);
-          });
-        }
-      });
-    } else {
-      // Remove all translations
-      document.querySelectorAll('.linguaswap-word').forEach(el => {
-        el.outerHTML = el.getAttribute('title');
-      });
-    }
-  } else if (message.type === 'wordListUpdated') {
-    if (isSwappingEnabled) {
-      chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
-        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-        if (message.langPairKey === currentLangPair) {
-          // First remove all existing translations
-          document.querySelectorAll('.linguaswap-word').forEach(el => {
-            el.outerHTML = el.getAttribute('title');
-          });
-          
-          // Then apply all translations from the updated word list
-          const currentWordList = wordLists[currentLangPair] || {};
-          Object.entries(currentWordList).forEach(([word, translation]) => {
-            replaceWords(word, translation);
-          });
-        }
-      });
-    }
-  } else if (message.type === 'settingsUpdated') {
-    if (isSwappingEnabled) {
-      // First remove all existing translations
-      document.querySelectorAll('.linguaswap-word').forEach(el => {
-        el.outerHTML = el.getAttribute('title');
-      });
-      
-      // Then apply translations for the new language pair
-      const langPairKey = `${message.settings.defaultLanguage}-${message.settings.targetLanguage}`;
-      chrome.storage.local.get('wordLists', ({ wordLists }) => {
+        const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
         const currentWordList = wordLists[langPairKey] || {};
         Object.entries(currentWordList).forEach(([word, translation]) => {
           replaceWords(word, translation);
@@ -114,12 +61,85 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     }
   }
+
+  // Get settings first to check for excluded sites
+  chrome.storage.local.get('settings', ({ settings }) => {
+    if (isExcludedSite(settings?.excludedSites || [])) {
+      return; // Skip processing if site is excluded
+    }
+
+    if (message.type === 'wordAdded' || message.type === 'wordEdited') {
+      debug('Processing word edit/add:', message);
+      if (isSwappingEnabled) {
+        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        debug('Current language pair:', currentLangPair, 'Message pair:', message.langPairKey);
+        
+        if (message.langPairKey === currentLangPair) {
+          removeAllTranslations(message.word);
+          replaceWords(message.word, message.translation);
+          debug('Translation updated on page');
+        }
+      }
+    } else if (message.type === 'wordDeleted') {
+      if (isSwappingEnabled) {
+        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        if (message.langPairKey === currentLangPair) {
+          removeAllTranslations(message.word);
+        }
+      }
+    } else if (message.type === 'toggleSwap') {
+      isSwappingEnabled = message.isEnabled;
+      if (isSwappingEnabled) {
+        chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
+          if (wordLists && settings) {
+            const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+            const currentWordList = wordLists[langPairKey] || {};
+            removeAllTranslations();
+            Object.entries(currentWordList).forEach(([word, translation]) => {
+              replaceWords(word, translation);
+            });
+          }
+        });
+      } else {
+        removeAllTranslations();
+      }
+    } else if (message.type === 'wordListUpdated') {
+      if (isSwappingEnabled) {
+        chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
+          const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+          if (message.langPairKey === currentLangPair) {
+            removeAllTranslations();
+            const currentWordList = wordLists[currentLangPair] || {};
+            Object.entries(currentWordList).forEach(([word, translation]) => {
+              replaceWords(word, translation);
+            });
+          }
+        });
+      }
+    } else if (message.type === 'settingsUpdated') {
+      if (isSwappingEnabled) {
+        removeAllTranslations();
+        const langPairKey = `${message.settings.defaultLanguage}-${message.settings.targetLanguage}`;
+        chrome.storage.local.get('wordLists', ({ wordLists }) => {
+          const currentWordList = wordLists[langPairKey] || {};
+          Object.entries(currentWordList).forEach(([word, translation]) => {
+            replaceWords(word, translation);
+          });
+        });
+      }
+    }
+  });
 });
 
 // Initial page load
 chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = {}, isEnabled = true, settings }) => {
   isSwappingEnabled = isEnabled;
-  if (isSwappingEnabled && settings) {
+  
+  if (!settings?.excludedSites) {
+    settings.excludedSites = [];
+  }
+
+  if (isSwappingEnabled && settings && !isExcludedSite(settings.excludedSites)) {
     const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
     const currentWordList = wordLists[langPairKey] || {};
     Object.entries(currentWordList).forEach(([word, translation]) => {

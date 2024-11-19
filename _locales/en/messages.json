@@ -79,5 +79,11 @@
     },
     "exportBtnText": {
       "message": "Export"
+    },
+    "excludedSitesLabel": {
+      "message": "Excluded Sites"
+    },
+    "excludedSitesHelp": {
+      "message": "Pages containing these paths will not be translated"
     }
   }

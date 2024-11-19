@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LinguaSwap",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Learn new words from foreign languages while browsing by replacing words with their translations",
   "default_locale": "en",
   "icons": {

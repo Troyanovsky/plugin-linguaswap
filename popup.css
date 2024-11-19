@@ -520,3 +520,21 @@ input:checked + .toggle-slider:before {
 .provider-btn:hover:not(.active) {
   background: rgba(255, 255, 255, 0.5);
 }
+
+textarea#excludedSites {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+#excludedSitesHelp {
+  color: #666;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}

@@ -79,5 +79,11 @@
     },
     "exportBtnText": {
       "message": "导出"
+    },
+    "excludedSitesLabel": {
+      "message": "排除网站"
+    },
+    "excludedSitesHelp": {
+      "message": "包含这些路径的页面将不会被翻译"
     }
   }
