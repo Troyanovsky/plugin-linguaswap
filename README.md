@@ -11,9 +11,21 @@ LinguaSwap is a Chrome extension designed to make language learning an integral 
 
 ## Getting Started
 
-1. Install LinguaSwap from the Chrome Web Store.
-2. Open LinguaSwap from your extensions to set up your default and target languages.
+### Option 1: Chrome Web Store (Recommended)
+1. Install LinguaSwap from the [Chrome Web Store](https://chromewebstore.google.com/detail/linguaswap/alccaibaldgnhnfbooofkmdljijcemie?utm_source=github)
+2. Open LinguaSwap from your extensions to set up your default and target languages
 3. Start browsing, adding words, and expanding your vocabulary!
+
+### Option 2: Developer Mode
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Troyanovsky/plugin-linguaswap.git
+   ```
+2. Open Chrome and navigate to `chrome://extensions`
+3. Enable "Developer mode" in the top right corner
+4. Click "Load unpacked" and select the cloned repository folder
+5. Open LinguaSwap from your extensions to set up your default and target languages
+6. Start browsing, adding words, and expanding your vocabulary!
 
 ## Changelog
 - 1.0.0: Initial release. Users need their own DeepL API key.

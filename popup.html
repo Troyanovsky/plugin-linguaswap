@@ -11,68 +11,68 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>LinguaSwap</h1>
+            <h1 id="appTitle">LinguaSwap</h1>
             <label class="toggle">
                 <input type="checkbox" id="swapToggle">
                 <span class="toggle-slider"></span>
             </label>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="wordlist">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="tabs" id="navigationTabs">
+            <button class="tab-btn active" id="wordlistTab" data-tab="wordlist">
+                <svg id="wordlistIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                     <rect x="9" y="3" width="6" height="4" rx="2" />
                     <path d="M9 14h6" />
                     <path d="M9 10h6" />
                     <path d="M9 18h6" />
                 </svg>
-                Word List
+                <span id="wordlistLabel">Word List</span>
             </button>
-            <button class="tab-btn" data-tab="settings">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="tab-btn" id="settingsTab" data-tab="settings">
+                <svg id="settingsIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                     <path
                         d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" />
                 </svg>
-                Settings
+                <span id="settingsLabel">Settings</span>
             </button>
         </div>
 
         <!-- Add the tab content sections -->
         <div class="tab-content" id="settings">
-            <div class="how-to-use">
-                <h3>How It Works</h3>
-                <ol>
-                    <li>Select your default and target languages below</li>
-                    <li>On any webpage, highlight a word, right-click and select "Add to LinguaSwap"</li>
-                    <li>When you revisit pages, words in your default language will automatically show their translations</li>
+            <div class="how-to-use" id="howToUseSection">
+                <h3 id="howToUseTitle">How It Works</h3>
+                <ol id="howToUseSteps">
+                    <li id="step1">Select your default and target languages below</li>
+                    <li id="step2">On any webpage, highlight a word, right-click and select "Add to LinguaSwap"</li>
+                    <li id="step3">When you revisit pages, words in your default language will automatically show their translations</li>
                 </ol>
             </div>
             
             <div class="form-group">
-                <label for="defaultLanguage">Default Language</label>
+                <label id="defaultLanguageLabel" for="defaultLanguage">Default Language</label>
                 <select id="defaultLanguage">
-                    <option value="ZH">Chinese</option>
-                    <option value="EN">English</option>
+                    <option id="defaultLangZH" value="ZH">Chinese</option>
+                    <option id="defaultLangEN" value="EN">English</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="targetLanguage">Target Language</label>
+                <label id="targetLanguageLabel" for="targetLanguage">Target Language</label>
                 <select id="targetLanguage">
-                    <option value="EN-US">English</option>
-                    <option value="DE">German</option>
-                    <option value="FR">French</option>
-                    <option value="ES">Spanish</option>
+                    <option id="targetLangEN" value="EN-US">English</option>
+                    <option id="targetLangDE" value="DE">German</option>
+                    <option id="targetLangFR" value="FR">French</option>
+                    <option id="targetLangES" value="ES">Spanish</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Translation Provider</label>
-                <div class="provider-toggle">
-                    <button class="provider-btn" data-provider="openrouter">LLM</button>
-                    <button class="provider-btn" data-provider="deepl">DeepL</button>
+                <label id="providerLabel">Translation Provider</label>
+                <div class="provider-toggle" id="providerToggle">
+                    <button id="llmProviderBtn" class="provider-btn" data-provider="openrouter">LLM</button>
+                    <button id="deeplProviderBtn" class="provider-btn" data-provider="deepl">DeepL</button>
                 </div>
             </div>
 
@@ -97,7 +97,7 @@
                         <line x1="10" y1="1" x2="10" y2="4" />
                         <line x1="14" y1="1" x2="14" y2="4" />
                     </svg>
-                    Buy me a coffee
+                    <span id="buyMeCoffeeText">Buy me a coffee</span>
                 </a>
             </div>
             <div class="form-group" style="margin-top: 10px; text-align: center;">
@@ -105,7 +105,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
                         <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
                     </svg>
-                    View on GitHub
+                    <span id="githubLinkText">View on GitHub</span>
                 </a>
             </div>
             <div class="form-group" style="margin-top: 10px; text-align: center;">
@@ -113,7 +113,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                     </svg>
-                    Give Feedback
+                    <span id="feedbackLinkText">Give Feedback</span>
                 </a>
             </div>
         </div>
