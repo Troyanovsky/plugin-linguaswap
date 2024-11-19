@@ -31,6 +31,42 @@ function removeAllTranslations(wordFilter = null) {
   });
 }
 
+// Apply translations for a language pair
+function applyTranslations(wordList) {
+  Object.entries(wordList).forEach(([word, translation]) => {
+    replaceWords(word, translation);
+  });
+}
+
+// Get current language pair key from settings
+function getLangPairKey(settings) {
+  return `${settings.defaultLanguage}-${settings.targetLanguage}`;
+}
+
+// Apply translations from storage for current language pair
+async function applyStoredTranslations() {
+  const { wordLists, settings } = await chrome.storage.local.get(['wordLists', 'settings']);
+  const langPairKey = getLangPairKey(settings);
+  const currentWordList = wordLists[langPairKey] || {};
+  applyTranslations(currentWordList);
+}
+
+// Create translated span element
+function createTranslatedSpan(originalWord, translation, parentStyle) {
+  const span = document.createElement('span');
+  span.className = 'linguaswap-word';
+  span.setAttribute('title', originalWord);
+  span.textContent = translation;
+  
+  // Inherit styles
+  span.style.color = 'inherit';
+  span.style.fontSize = parentStyle.fontSize;
+  span.style.fontFamily = parentStyle.fontFamily;
+  span.style.fontWeight = parentStyle.fontWeight;
+  
+  return span;
+}
+
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   debug('Content script received message:', message);
@@ -44,45 +80,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       currentUrl.toLowerCase().includes(site.toLowerCase())
     );
 
-    // If site was not excluded but is now excluded, remove all translations
     if (!wasExcluded && isNowExcluded) {
       removeAllTranslations();
       return;
     }
 
-    // If site was excluded but is now not excluded, apply translations
     if (wasExcluded && !isNowExcluded) {
-      chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
-        const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-        const currentWordList = wordLists[langPairKey] || {};
-        Object.entries(currentWordList).forEach(([word, translation]) => {
-          replaceWords(word, translation);
-        });
-      });
+      applyStoredTranslations();
     }
   }
 
-  // Get settings first to check for excluded sites
   chrome.storage.local.get('settings', ({ settings }) => {
-    if (isExcludedSite(settings?.excludedSites || [])) {
-      return; // Skip processing if site is excluded
-    }
+    if (isExcludedSite(settings?.excludedSites || [])) return;
 
     if (message.type === 'wordAdded' || message.type === 'wordEdited') {
-      debug('Processing word edit/add:', message);
       if (isSwappingEnabled) {
-        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-        debug('Current language pair:', currentLangPair, 'Message pair:', message.langPairKey);
-        
+        const currentLangPair = getLangPairKey(settings);
         if (message.langPairKey === currentLangPair) {
           removeAllTranslations(message.word);
           replaceWords(message.word, message.translation);
-          debug('Translation updated on page');
         }
       }
     } else if (message.type === 'wordDeleted') {
       if (isSwappingEnabled) {
-        const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
+        const currentLangPair = getLangPairKey(settings);
         if (message.langPairKey === currentLangPair) {
           removeAllTranslations(message.word);
         }
@@ -90,43 +111,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.type === 'toggleSwap') {
       isSwappingEnabled = message.isEnabled;
       if (isSwappingEnabled) {
-        chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
-          if (wordLists && settings) {
-            const langPairKey = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-            const currentWordList = wordLists[langPairKey] || {};
-            removeAllTranslations();
-            Object.entries(currentWordList).forEach(([word, translation]) => {
-              replaceWords(word, translation);
-            });
-          }
-        });
+        applyStoredTranslations();
       } else {
         removeAllTranslations();
       }
     } else if (message.type === 'wordListUpdated') {
       if (isSwappingEnabled) {
-        chrome.storage.local.get(['wordLists', 'settings'], ({ wordLists, settings }) => {
-          const currentLangPair = `${settings.defaultLanguage}-${settings.targetLanguage}`;
-          if (message.langPairKey === currentLangPair) {
-            removeAllTranslations();
-            const currentWordList = wordLists[currentLangPair] || {};
-            Object.entries(currentWordList).forEach(([word, translation]) => {
-              replaceWords(word, translation);
-            });
-          }
-        });
+        const currentLangPair = getLangPairKey(settings);
+        if (message.langPairKey === currentLangPair) {
+          removeAllTranslations();
+          applyStoredTranslations();
+        }
       }
-    } else if (message.type === 'settingsUpdated') {
-      if (isSwappingEnabled) {
-        removeAllTranslations();
-        const langPairKey = `${message.settings.defaultLanguage}-${message.settings.targetLanguage}`;
-        chrome.storage.local.get('wordLists', ({ wordLists }) => {
-          const currentWordList = wordLists[langPairKey] || {};
-          Object.entries(currentWordList).forEach(([word, translation]) => {
-            replaceWords(word, translation);
-          });
-        });
-      }
+    } else if (message.type === 'settingsUpdated' && isSwappingEnabled) {
+      removeAllTranslations();
+      const langPairKey = getLangPairKey(message.settings);
+      chrome.storage.local.get('wordLists', ({ wordLists }) => {
+        const currentWordList = wordLists[langPairKey] || {};
+        applyTranslations(currentWordList);
+      });
     }
   });
 });
@@ -152,24 +155,22 @@ chrome.storage.local.get(['wordLists', 'isEnabled', 'settings'], ({ wordLists = 
 function replaceWords(word, translation) {
   const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, li');
   
-  // First, restore any existing translations of this word
+  // Update existing translations
   document.querySelectorAll('.linguaswap-word').forEach(el => {
     if (el.getAttribute('title').toLowerCase() === word.toLowerCase()) {
       el.textContent = translation;
     }
   });
 
-  // Then proceed with finding and replacing new instances
+  // Process new translations
   chrome.storage.local.get('settings', ({ settings }) => {
     const isChineseSource = settings?.defaultLanguage === 'ZH';
+    const regex = isChineseSource
+      ? new RegExp(escapeRegExp(word), 'g')
+      : new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi');
     
     elements.forEach(element => {
       if (shouldSkipElement(element)) return;
-
-      // Create appropriate regex based on language
-      const regex = isChineseSource
-        ? new RegExp(escapeRegExp(word), 'g')  // Chinese: match without word boundaries
-        : new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi');  // Other languages: use word boundaries
       
       // Process all text nodes within the element
       const textNodes = [];
@@ -200,22 +201,13 @@ function replaceWords(word, translation) {
         const matches = textNode.textContent.match(regex) || [];
         
         parts.forEach((part, index) => {
-          // Add the regular text
           if (part) {
             fragment.appendChild(document.createTextNode(part));
           }
           
-          // Add the translated word if there's a match
           if (index < matches.length) {
-            const span = document.createElement('span');
-            span.className = 'linguaswap-word';
-            span.setAttribute('title', matches[index]);
-            span.textContent = translation;
             const computedStyle = window.getComputedStyle(textNode.parentElement);
-            span.style.color = 'inherit';
-            span.style.fontSize = computedStyle.fontSize;
-            span.style.fontFamily = computedStyle.fontFamily;
-            span.style.fontWeight = computedStyle.fontWeight;
+            const span = createTranslatedSpan(matches[index], translation, computedStyle);
             fragment.appendChild(span);
           }
         });
