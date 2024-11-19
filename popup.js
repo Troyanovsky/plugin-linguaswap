@@ -23,7 +23,7 @@ const setToStorage = async (data) => {
   debug('Storage set:', data);
 };
 
-const updateWordList = async (langPairKey, updates) => {
+const updateStoredWordList = async (langPairKey, updates) => {
   const { wordLists = {} } = await getFromStorage('wordLists');
   wordLists[langPairKey] = wordLists[langPairKey] || {};
   Object.assign(wordLists[langPairKey], updates);
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           // Convert array to object for storage
           const updates = Object.fromEntries(wordPairs);
-          const updatedList = await updateWordList(langPairKey, updates);
+          const updatedList = await updateStoredWordList(langPairKey, updates);
           
           // Update currentWordList reference
           Object.assign(currentWordList, updatedList);
@@ -518,7 +518,7 @@ function addWordToList(word, translation, container, langPairKey, currentWordLis
       const newTranslation = inputField.value.trim();
       if (newTranslation) {
         const updates = { [word]: newTranslation };
-        const updatedList = await updateWordList(langPairKey, updates);
+        const updatedList = await updateStoredWordList(langPairKey, updates);
         
         // Update the current word list
         Object.assign(currentWordList, updatedList);
