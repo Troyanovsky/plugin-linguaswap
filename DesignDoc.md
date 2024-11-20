@@ -113,35 +113,79 @@ Key Features:
 
 ## API Implementation
 
-**Endpoint**:  
-`GET https://linguaswap.524619251.xyz/api/translate`
+### Translation Endpoint
+**Base URL**: `https://plugin-linguaswap-backend.vercel.app/api` or `https://linguaswap.524619251.xyz/api`
 
-### Query Parameters
+#### Translate Text
+**Endpoint**: `GET /api/translate`
+
+**Query Parameters**
 - **text** (string, required): The text to translate. Must be 30 characters or fewer.
-- **source_lang** (string, optional): The source language code (e.g., `EN` for English). If omitted, translation provider auto-detects.
+- **source_lang** (string, optional): The source language code (e.g., `EN` for English). If omitted, auto-detection is used.
 - **target_lang** (string, required): The target language code (e.g., `DE` for German).
-- **provider** (string, optional): The translation provider. If omitted, defaults to `deepl`.
-- **context** (string, optional): Additional context for translation (optional, not yet implemented).
-- **caller** (string, optional): The caller ID (optional).
+- **provider** (string, optional): The translation provider. Defaults to `deepl`. Supported: `deepl`, `openrouter`.
+- **context** (string, optional): Additional context for translation.
+- **caller** (string, optional): Identifier for request client id (for debugging & rate limiting).
 
-### Responses
-- **200 OK**
-  ```json
-  {
-    "translations": [
-      { "text": "translated_text_here" }
-    ]
-  }
-  ```
-- **Error Codes**
-  - `401 Unauthorized`: Origin not allowed.
-  - `405 Method Not Allowed`: Only `GET` allowed.
-  - `400 Bad Request`: Invalid parameters or text too long.
-  - `500 Internal Server Error`: Translation failed.
+**Response (200 OK)**
+```json
+{
+  "translations": [
+    { "text": "translated_text_here" }
+  ]
+}
+```
 
-### Example Request
+### Wordlists Endpoint
+**Endpoint**: `GET /api/wordlists`
+
+**Query Parameters**
+- **id** (string, optional): Specific wordlist identifier. If omitted, returns all available wordlists.
+
+**Response (200 OK)**
+- List all wordlists:
+```json
+{
+  "wordlists": [
+    {
+      "id": "EN-DE-example",
+      "source_lang": "EN",
+      "target_lang": "DE"
+    }
+  ]
+}
+```
+- Specific wordlist:
+```json
+{
+  "id": "EN-DE-example",
+  "source_lang": "EN",
+  "target_lang": "DE",
+  "words": [
+    {
+      "EN": "example",
+      "DE": "beispiel"
+    }
+  ]
+}
+```
+
+### Error Responses
+- **405 Method Not Allowed**: Only `GET` and `OPTIONS` allowed
+- **400 Bad Request**: Invalid parameters or text exceeding length
+- **404 Not Found**: Requested wordlist not found
+- **500 Internal Server Error**: Server-side issues
+
+### Example Requests
 ```bash
+# Translate text
 curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_lang=DE"
+
+# Get all wordlists
+curl -X GET "https://linguaswap.524619251.xyz/api/wordlists"
+
+# Get specific wordlist
+curl -X GET "https://linguaswap.524619251.xyz/api/wordlists?id=EN-DE-example"
 ```
 
 ## Current Considerations
@@ -156,6 +200,7 @@ curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_la
 - Multiple translation providers (DeepL, LLMs through OpenRouter) (Added Nov 9, 2024)
 - UI localization for Chinese (Added Nov 16, 2024)
 - Site exclusion functionality (Added Nov 17, 2024)
+- Download pre-made word lists from server (Added Nov 20, 2024)
 
 ### Technical Implementation
 - Uses `computedStyle` for style inheritance
@@ -163,7 +208,6 @@ curl -X GET "https://linguaswap.524619251.xyz/api/translate?text=Hello&target_la
 - Preserves text node structure
 
 ## Future Enhancements
-- Download pre-made word lists (Backend done, client to be done)
 - Easier management of word lists (pagination etc.)
 - Word frequency statistics
 - Multilingual UI

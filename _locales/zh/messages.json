@@ -85,5 +85,23 @@
     },
     "excludedSitesHelp": {
       "message": "包含这些路径的页面将不会被翻译"
+    },
+    "downloadWordListBtn": {
+      "message": "下载单词列表"
+    },
+    "noAvailableWordLists": {
+      "message": "当前语言对没有可用的单词列表"
+    },
+    "availableWordListsTitle": {
+      "message": "可用单词列表"
+    },
+    "importWordListConfirm": {
+      "message": "这将把所选列表中的所有单词添加到您当前的单词列表中。是否继续？"
+    },
+    "importWordListBtn": {
+      "message": "导入"
+    },
+    "closeBtn": {
+      "message": "关闭"
     }
   }

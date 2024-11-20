@@ -85,5 +85,23 @@
     },
     "excludedSitesHelp": {
       "message": "Pages containing these paths will not be translated"
+    },
+    "downloadWordListBtn": {
+      "message": "Download Word List"
+    },
+    "noAvailableWordLists": {
+      "message": "No word lists available for current language pair"
+    },
+    "availableWordListsTitle": {
+      "message": "Available Word Lists"
+    },
+    "importWordListConfirm": {
+      "message": "This will add all words from the selected list to your current word list. Continue?"
+    },
+    "importWordListBtn": {
+      "message": "Import"
+    },
+    "closeBtn": {
+      "message": "Close"
     }
   }

@@ -63,7 +63,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     'githubLinkText': 'githubLinkText',
     'feedbackLinkText': 'feedbackLinkText',
     'excludedSitesLabel': 'excludedSitesLabel',
-    'excludedSitesHelp': 'excludedSitesHelp'
+    'excludedSitesHelp': 'excludedSitesHelp',
+    'downloadWordListBtn': 'downloadWordListBtn'
   };
 
   Object.entries(elementsToLocalize).forEach(([id, messageName]) => {
@@ -472,6 +473,124 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initial word list population
   updateWordList();
+
+  // Main function to create wordlist modal
+  function createWordListModal(availableLists, currentSettings, onImportSuccess) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    
+    const title = document.createElement('h3');
+    title.textContent = chrome.i18n.getMessage('availableWordListsTitle');
+    modalContent.appendChild(title);
+    
+    if (availableLists.length === 0) {
+      const message = document.createElement('p');
+      message.textContent = chrome.i18n.getMessage('noAvailableWordLists');
+      modalContent.appendChild(message);
+    } else {
+      const list = document.createElement('div');
+      list.className = 'available-wordlists';
+      
+      availableLists.forEach(wordlist => {
+        const item = document.createElement('div');
+        item.className = 'wordlist-item';
+        
+        const id = document.createElement('span');
+        id.textContent = wordlist.id;
+        
+        const importBtn = document.createElement('button');
+        importBtn.className = 'wordlist-import-btn';
+        importBtn.textContent = chrome.i18n.getMessage('importWordListBtn');
+        
+        importBtn.addEventListener('click', async () => {
+          if (confirm(chrome.i18n.getMessage('importWordListConfirm'))) {
+            try {
+              const response = await fetch(`https://linguaswap.524619251.xyz/api/wordlists?id=${wordlist.id}`);
+              if (!response.ok) throw new Error('Failed to fetch word list');
+              
+              const data = await response.json();
+              const updates = Object.fromEntries(
+                data.words.map(pair => [pair[currentSettings.defaultLanguage], pair[currentSettings.targetLanguage]])
+              );
+              
+              const langPairKey = `${currentSettings.defaultLanguage}-${currentSettings.targetLanguage}`;
+              await updateStoredWordList(langPairKey, updates);
+              
+              await sendMessageToAllTabs({
+                type: 'wordListUpdated',
+                langPairKey
+              });
+              
+              modal.remove();
+              showNotification('Word list imported successfully!');
+              
+              // Call the callback to handle UI updates
+              if (onImportSuccess) {
+                onImportSuccess(langPairKey);
+              }
+              
+            } catch (error) {
+              showNotification(error.message, 'error');
+            }
+          }
+        });
+        
+        item.appendChild(id);
+        item.appendChild(importBtn);
+        list.appendChild(item);
+      });
+      
+      modalContent.appendChild(list);
+    }
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close';
+    closeBtn.textContent = chrome.i18n.getMessage('closeBtn');
+    closeBtn.onclick = () => modal.remove();
+    
+    modalContent.appendChild(closeBtn);
+    modal.appendChild(modalContent);
+    return modal;
+  }
+
+  // Add event listener for the download button
+  document.getElementById('downloadWordListBtn').addEventListener('click', async () => {
+    try {
+      const response = await fetch('https://linguaswap.524619251.xyz/api/wordlists');
+      if (!response.ok) throw new Error('Failed to fetch word lists');
+      
+      const data = await response.json();
+      const { settings: currentSettings } = await getFromStorage('settings');
+      
+      // Filter lists matching current language pair
+      const matchingLists = data.wordlists.filter(list => 
+        list.source_lang === currentSettings.defaultLanguage && 
+        list.target_lang === currentSettings.targetLanguage
+      );
+      
+      // Pass a callback to handle successful import
+      const onImportSuccess = async (langPairKey) => {
+        // Refresh the word list display
+        const { wordLists } = await getFromStorage('wordLists');
+        const currentWordList = wordLists[langPairKey] || {};
+        
+        // Clear and rebuild the word list display
+        const wordListContainer = document.getElementById('wordList');
+        if (wordListContainer) {
+          wordListContainer.innerHTML = '';
+          updateWordList(); // This will recreate the list with the new data
+        }
+      };
+      
+      const modal = createWordListModal(matchingLists, currentSettings, onImportSuccess);
+      document.body.appendChild(modal);
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  });
 });
 
 // Function to add a word to the word list
