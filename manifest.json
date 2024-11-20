@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "LinguaSwap",
+  "name": "__MSG_extensionName__",
   "version": "1.3.0",
-  "description": "Learn new words from foreign languages while browsing by replacing words with their translations",
+  "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "icons": {
     "16": "icons/icon16.png",

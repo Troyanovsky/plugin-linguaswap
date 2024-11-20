@@ -1,107 +1,113 @@
 {
-    "appTitle": {
-      "message": "LinguaSwap"
-    },
-    "wordlistLabel": {
-      "message": "Word List"
-    },
-    "settingsLabel": {
-      "message": "Settings"
-    },
-    "howToUseTitle": {
-      "message": "How It Works"
-    },
-    "step1": {
-      "message": "Select your default and target languages below"
-    },
-    "step2": {
-      "message": "On any webpage, highlight a word, right-click and select \"Add to LinguaSwap\""
-    },
-    "step3": {
-      "message": "When you revisit pages, words in your default language will automatically show their translations"
-    },
-    "defaultLanguageLabel": {
-      "message": "Default Language"
-    },
-    "targetLanguageLabel": {
-      "message": "Target Language"
-    },
-    "providerLabel": {
-      "message": "Translation Provider"
-    },
-    "llmProviderBtn": {
-      "message": "LLM"
-    },
-    "deeplProviderBtn": {
-      "message": "DeepL"
-    },
-    "saveSettings": {
-      "message": "Save Settings"
-    },
-    "buyMeCoffeeText": {
-      "message": "Buy me a coffee"
-    },
-    "githubLinkText": {
-      "message": "View on GitHub"
-    },
-    "feedbackLinkText": {
-      "message": "Give Feedback"
-    },
-    "defaultLangZH": {
-      "message": "Chinese"
-    },
-    "defaultLangEN": {
-      "message": "English"
-    },
-    "targetLangEN": {
-      "message": "English"
-    },
-    "targetLangDE": {
-      "message": "German"
-    },
-    "targetLangFR": {
-      "message": "French"
-    },
-    "targetLangES": {
-      "message": "Spanish"
-    },
-    "emptyStateTitle": {
-      "message": "No words added yet"
-    },
-    "emptyStateSubtitle": {
-      "message": "Words you add will appear here"
-    },
-    "wordSearchInput": {
-      "message": "Search words..."
-    },
-    "importBtnText": {
-      "message": "Import"
-    },
-    "exportBtnText": {
-      "message": "Export"
-    },
-    "excludedSitesLabel": {
-      "message": "Excluded Sites"
-    },
-    "excludedSitesHelp": {
-      "message": "Pages containing these paths will not be translated"
-    },
-    "downloadWordListBtn": {
-      "message": "Download Word List"
-    },
-    "noAvailableWordLists": {
-      "message": "No word lists available for current language pair"
-    },
-    "availableWordListsTitle": {
-      "message": "Available Word Lists"
-    },
-    "importWordListConfirm": {
-      "message": "This will add all words from the selected list to your current word list. Continue?"
-    },
-    "importWordListBtn": {
-      "message": "Import"
-    },
-    "closeBtn": {
-      "message": "Close"
-    }
+  "extensionName": {
+    "message": "LinguaSwap"
+  },
+  "extensionDescription": {
+    "message": "Learn new words from foreign languages while browsing by replacing words with their translations"
+  },
+  "appTitle": {
+    "message": "LinguaSwap"
+  },
+  "wordlistLabel": {
+    "message": "Word List"
+  },
+  "settingsLabel": {
+    "message": "Settings"
+  },
+  "howToUseTitle": {
+    "message": "How It Works"
+  },
+  "step1": {
+    "message": "Select your default and target languages below"
+  },
+  "step2": {
+    "message": "On any webpage, highlight a word, right-click and select \"Add to LinguaSwap\""
+  },
+  "step3": {
+    "message": "When you revisit pages, words in your default language will automatically show their translations"
+  },
+  "defaultLanguageLabel": {
+    "message": "Default Language"
+  },
+  "targetLanguageLabel": {
+    "message": "Target Language"
+  },
+  "providerLabel": {
+    "message": "Translation Provider"
+  },
+  "llmProviderBtn": {
+    "message": "LLM"
+  },
+  "deeplProviderBtn": {
+    "message": "DeepL"
+  },
+  "saveSettings": {
+    "message": "Save Settings"
+  },
+  "buyMeCoffeeText": {
+    "message": "Buy me a coffee"
+  },
+  "githubLinkText": {
+    "message": "View on GitHub"
+  },
+  "feedbackLinkText": {
+    "message": "Give Feedback"
+  },
+  "defaultLangZH": {
+    "message": "Chinese"
+  },
+  "defaultLangEN": {
+    "message": "English"
+  },
+  "targetLangEN": {
+    "message": "English"
+  },
+  "targetLangDE": {
+    "message": "German"
+  },
+  "targetLangFR": {
+    "message": "French"
+  },
+  "targetLangES": {
+    "message": "Spanish"
+  },
+  "emptyStateTitle": {
+    "message": "No words added yet"
+  },
+  "emptyStateSubtitle": {
+    "message": "Words you add will appear here"
+  },
+  "wordSearchInput": {
+    "message": "Search words..."
+  },
+  "importBtnText": {
+    "message": "Import"
+  },
+  "exportBtnText": {
+    "message": "Export"
+  },
+  "excludedSitesLabel": {
+    "message": "Excluded Sites"
+  },
+  "excludedSitesHelp": {
+    "message": "Pages containing these paths will not be translated"
+  },
+  "downloadWordListBtn": {
+    "message": "Download Word List"
+  },
+  "noAvailableWordLists": {
+    "message": "No word lists available for current language pair"
+  },
+  "availableWordListsTitle": {
+    "message": "Available Word Lists"
+  },
+  "importWordListConfirm": {
+    "message": "This will add all words from the selected list to your current word list. Continue?"
+  },
+  "importWordListBtn": {
+    "message": "Import"
+  },
+  "closeBtn": {
+    "message": "Close"
   }
+}
